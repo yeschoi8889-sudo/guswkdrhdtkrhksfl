@@ -129,6 +129,18 @@ async function gas(fn,...args){
     const j=await r.json();if(!j.ok){const e=new Error(j.error==='unauthorized'?'접속 키가 맞지 않습니다. 접속 링크로 다시 열어주세요':j.error);e.auth=j.error==='unauthorized';throw e;}return j.data;
   }finally{clearTimeout(tm);}
 }
+async function diagnose(){
+  const o=[],cut=u=>u.length>64?u.slice(0,40)+'…'+u.slice(-16):u,box=$('#diag');box.textContent='진단 중…';
+  o.push('서버 주소: '+cut(CFG.api||'(없음)'));
+  o.push(/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(CFG.api)?'① 주소 형식: 정상':'① 주소 형식: 이상 (…/macros/s/…/exec 여야 함. /dev 이면 배포 전 주소)');
+  try{const r=await fetch(CFG.api,{redirect:'follow'});const x=await r.text();o.push(x.indexOf('현장OS API')>=0?'② 서버 열기(GET): 정상':'② 서버 열기(GET): 다른 내용이 옴 → 로그인 화면이면 접근 권한이 "모든 사용자"가 아님');}
+  catch(e){o.push('② 서버 열기(GET): 실패 ('+e.message+') → 접근 권한이 "모든 사용자"가 아니거나 주소가 틀림');}
+  try{const r=await fetch(CFG.api,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:'diag',fn:'getData'}),redirect:'follow'});const j=await r.json();
+    o.push('③ 서버 호출(POST): '+(j.error==='unauthorized'?'정상 (서버가 키 검사까지 함)':'응답 '+JSON.stringify(j).slice(0,80)));
+    o.push('④ 내 접속 키: '+(CFG.key?CFG.key.length+'자':'없음')+(CFG.key.length===64?' (정상 길이)':' (setupKey 링크의 키는 64자)'));}
+  catch(e){o.push('③ 서버 호출(POST): 실패 ('+e.message+') → ②가 정상이면 새 버전 배포가 안 된 것(배포 관리 > ✏ > 새 버전)');}
+  box.textContent=o.join('\n');
+}
 function showSetup(msg){$('#loading').innerHTML='<div style="padding:24px;max-width:420px;margin:0 auto;text-align:center"><b>처음 한 번 설정</b><br><br><span style="font-size:13px;line-height:1.6">'+(msg||'접속 링크를 아래에 붙여넣으세요')+'</span><br><br><textarea id="cfg" class="in" style="min-height:90px" placeholder="https://…/?api=…&k=…"></textarea><button class="save" onclick="applyCfg()">연결</button></div>';}
 function applyCfg(){try{const u=new URL($('#cfg').value.trim());const a=u.searchParams.get('api'),k=u.searchParams.get('k');if(!a||!k)throw 0;location.href=location.origin+location.pathname+'?api='+encodeURIComponent(a)+'&k='+encodeURIComponent(k);}catch(e){toast('링크가 올바르지 않습니다');}}
 const now=()=>{const d=new Date();return ds(d)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
@@ -176,7 +188,7 @@ async function load(){
   try{const ops=await IDB.all().catch(()=>[]);pending=ops.length;badge();
     if(ops.length){sync();}
     else{const r=await gas('getData');D=JSON.parse(r);D.records.sort((x,y)=>x.일시<y.일시?1:-1);if(!S.ym){S.ym=D.today.slice(0,7);S.day=D.today;}saveCache();render();hideLoading();}
-  }catch(e){if(!D)$('#loading').innerHTML='<div style="padding:24px;text-align:center"><b>불러오기 실패</b><br><br><span style="font-size:13px">'+esc(e.message||e)+'</span><br><br><button class="save" style="width:auto;padding:10px 20px" onclick="location.reload()">다시 시도</button></div>';else toast('서버 연결 안 됨 · 기록은 기기에 보관됨');}
+  }catch(e){if(!D)$('#loading').innerHTML='<div style="padding:24px;text-align:center"><b>불러오기 실패</b><br><br><span style="font-size:13px">'+esc(e.message||e)+'</span><br><br><button class="save" style="width:auto;padding:10px 20px" onclick="location.reload()">다시 시도</button><br><button class="ghost" onclick="diagnose()">연결 진단</button><pre id="diag" style="text-align:left;font-size:11px;white-space:pre-wrap;word-break:break-all;margin-top:8px"></pre></div>';else toast('서버 연결 안 됨 · 기록은 기기에 보관됨');}
 }
 window.addEventListener('online',sync);document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync();});setInterval(()=>{if(pending||syncErr)sync();},20000);
 
