@@ -174,6 +174,7 @@ const addWork=(d,n)=>{d=new Date(d);while(n>0){d.setDate(d.getDate()+1);if(isWor
 const nextWork=d=>addWork(d,1);
 const workdays=(a,b)=>{let n=0;for(let d=new Date(a);d<=b;d.setDate(d.getDate()+1))if(isWork(d))n++;return Math.max(n,1)};
 const won=n=>n?Number(n).toLocaleString():'0';
+const comma=v=>String(v==null?'':v).replace(/\D/g,'').replace(/^0+(?=\d)/,'').replace(/\B(?=(\d{3})+(?!\d))/g,','); // 입력 칸 세 자리 쉼표 (저장할 땐 숫자만)
 const man=n=>{n=+n||0;if(n>=100000000){const e=Math.floor(n/100000000),m=Math.round((n%100000000)/10000);return e+'억'+(m?' '+m.toLocaleString()+'만':'');}return n>=10000?Math.round(n/10000).toLocaleString()+'만':won(n);};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
 const TYPES=[['현장 점검','🔍'],['특이사항','⚠️'],['고객 대화','💬'],['제품 선택','🧱']];
@@ -1056,7 +1057,7 @@ function openSiteForm(id){
     <label class="l">평형</label><input class="in" id="s_py" value="${esc(s.평형||'')}" placeholder="예: 32평">
     <label class="l">주소</label><input class="in" id="s_addr" value="${esc(s.주소||'')}">
     <label class="l">연락처</label><input class="in" id="s_tel" inputmode="tel" value="${esc(s.연락처||'')}">
-    <label class="l">계약금액</label><input class="in" id="s_amt" inputmode="numeric" value="${s.계약금액||''}">
+    <label class="l">계약금액 (원)</label><input class="in" id="s_amt" inputmode="numeric" placeholder="예: 48,000,000" value="${s.계약금액?comma(s.계약금액):''}" oninput="this.value=comma(this.value);$('#s_amt_k').textContent=this.value?man(this.value.split(',').join(''))+'원':''"><div class="note" id="s_amt_k">${s.계약금액?man(s.계약금액)+'원':''}</div>
     <label class="l">상태</label><select class="in" id="s_st">${opt(D.base.lists.현장상태,s.상태)}</select>
     <label class="l">계약일</label><input type="date" class="in" id="s_c" value="${s.계약일||''}">
     <label class="l">착공일 (비포 촬영일 · 표준 초안 기준일)</label><input type="date" class="in" id="s_start" value="${s.착공일||''}">
