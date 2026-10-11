@@ -47,6 +47,8 @@ h2{font-size:.85rem;color:var(--mute);font-weight:700;margin:.9rem 1rem .4rem}
 .todo{display:flex;align-items:center;gap:.4rem;border-bottom:1px solid var(--line)}.todo:last-child{border:0}.todo .cb{padding:.7rem .6rem .7rem 0}.todo .cb i{display:block;width:1.8rem;height:1.8rem;border-radius:.5rem;border:3px solid #bbb;text-align:center;font-style:normal;line-height:1.3rem;color:#fff;font-weight:900}.todo.ok .cb i{background:var(--green);border-color:var(--green)}.todo.ok .cb i::after{content:"✓"}.todo .x{flex:1;min-width:0;padding:.55rem 0}.todo .x b{display:block;font-size:1rem}.todo.ok .x b{text-decoration:line-through;color:var(--mute)}.warn2{margin:.7rem .75rem .4rem;background:#FFF3D1;color:#7a4f00;border-radius:.8rem;padding:.6rem .8rem;font-weight:800}.todo small .r{color:var(--red);font-weight:800}.todo small{color:var(--mute);font-size:.85rem}.todo small u{display:inline-block;width:.6rem;height:.6rem;border-radius:.15rem;margin-right:.3rem}
 .qk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;padding:0 .75rem .4rem}.qk div{background:#fff;border-radius:1rem;text-align:center;padding:.8rem .2rem;font-weight:800;font-size:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06)}.qk em{display:block;font-style:normal;font-size:1.8rem;margin-bottom:.1rem}.qk div:last-child:nth-child(3n+1){grid-column:1/-1}
 .bk{display:inline-flex;align-items:center;background:#fff;color:var(--plum);border:0;border-radius:.7rem;padding:.5rem .85rem;font-weight:800;font-size:1rem;margin-bottom:.5rem;box-shadow:0 1px 2px rgba(0,0,0,.15)}header .bk,.rhead .bk{background:#fff;color:var(--plum)}.sheet .bk{background:var(--bg);box-shadow:none;margin:0 0 .4rem}
+.pbig{display:flex;gap:.5rem;margin-top:.7rem}.big{display:block;width:100%;border:0;border-radius:1rem;padding:.95rem .5rem;font-size:1.1rem;font-weight:800;margin-top:.6rem}.pbig .big{flex:1;margin-top:0}.big.go{background:var(--plum);color:#fff}.big.ok{background:var(--green);color:#fff}.big.undo{background:#ddd;color:#333}.big.ext{background:#fff;color:var(--rose);border:2px solid var(--rose)}.sub2{font-size:.9rem;color:var(--mute);margin:1.1rem 0 .1rem;font-weight:800;border-top:1px solid var(--line);padding-top:.8rem}
+.top2.t3{grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem}.top2.t3 div{padding:.75rem .3rem;font-size:.95rem}.bizal{margin:0 .75rem .7rem;background:#FFF3D1;border-radius:1rem;padding:.6rem .9rem;font-weight:700;color:#5a3d00}.bizal div{padding:.15rem 0}.bizal b{display:inline-block;min-width:3.4rem;color:#9a5b00}.bizal b.r,.todo small .r{color:var(--red)}.todo small .w{color:#b26a00;font-weight:800}
 .qk div.add{background:var(--plum);color:#fff}.kv b.fit{display:block}
 .empty{color:var(--mute);text-align:center;padding:2rem 1rem;font-size:1rem;line-height:1.6}
 .sum{display:flex;gap:.5rem;margin:0 .75rem .7rem}.sum div{flex:1;background:#fff;border-radius:.9rem;padding:.55rem .3rem;text-align:center}.sum b{display:block;font-size:1.5rem}.sum span{font-size:.75rem;color:var(--mute)}.sum .r b{color:var(--red)}
@@ -141,7 +143,8 @@ const workdays=(a,b)=>{let n=0;for(let d=new Date(a);d<=b;d.setDate(d.getDate()+
 const won=n=>n?Number(n).toLocaleString():'0';
 const man=n=>{n=+n||0;if(n>=100000000){const e=Math.floor(n/100000000),m=Math.round((n%100000000)/10000);return e+'억'+(m?' '+m.toLocaleString()+'만':'');}return n>=10000?Math.round(n/10000).toLocaleString()+'만':won(n);};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
-const TYPES=[['공정 끝','✅'],['공정 시작','▶️'],['현장 점검','🔍'],['특이사항','⚠️'],['고객 대화','💬'],['제품 선택','🧱']];
+const TYPES=[['현장 점검','🔍'],['특이사항','⚠️'],['고객 대화','💬'],['제품 선택','🧱']];
+const ICON={...Object.fromEntries(TYPES),'공정 끝':'✅','공정 시작':'▶️','공정 연장':'⏩','투입':'👷','할 일':'☑️'}; // 공정 끝·시작·연장은 공정 관리창이 자동으로 남기는 기록
 const MEDIA={'현장 점검':{cam:1,alb:1,vcam:1,valb:1},'제품 선택':{cam:1,alb:1,vcam:1,valb:1},'특이사항':{cam:1,alb:1},'고객 대화':{alb:1}}; // 종류별 사진·영상 버튼 (없으면 안 보임)
 const ACTIVE=['계약','시공중','AS'];
 
@@ -222,6 +225,7 @@ async function api(fn,...args){
   if(fn==='addSite')args[0].현장ID=args[0].현장ID||newId('S');
   if(fn==='addTeam')args[0].팀ID=args[0].팀ID||newId('T');
   if(fn==='addTodo')args[0].ID=args[0].ID||newId('d');
+  if(fn==='addBiz')args[0].ID=args[0].ID||newId('B');
   if(fn==='updateTodo'&&args[1]&&args[1].완료)args[1]._t=now();
   const qargs=fn==='addPhoto'?[args[0],{idx:args[1].idx,name:args[1].name,mime:args[1].mime,b64:args[1].b64}]:JSON.parse(JSON.stringify(args)); // 서버로 보낼 원본(화면 반영 전 복사). 사진은 원본 b64 그대로
   const out=LOCAL[fn](...args);                  // ① 즉시 반영
@@ -299,7 +303,8 @@ const LOCAL={
   addRecord(r,photos){if(D.records.find(x=>x.ID===r.ID))return r.ID;
     if(photos&&photos.length)r.사진=photos.map(p=>'data:image/jpeg;base64,'+p.b64).concat(r.사진?String(r.사진).split('|'):[]).join('|');
     if(r.유형==='투입'&&!r.금액&&r.단가)r.금액=(+r.공수||0)*(+r.단가||0);
-    if(r.유형==='공정 끝'&&r._seq){const p=procAt(r.현장ID,r._seq);if(p)p.상태='완료';}
+    if(r.유형==='공정 끝'&&r._seq){const p=procAt(r.현장ID,r._seq);if(p){if(r._newEnd&&p.끝!==r._newEnd)LOCAL.shiftProc(r.현장ID,r._seq,r._newEnd,r._follow===true&&r._newEnd>p.끝);const q=procAt(r.현장ID,r._seq);if(q)q.상태='완료';}}
+    if(r.유형==='공정 연장'&&r._seq&&r._newEnd){const res=LOCAL.shiftProc(r.현장ID,r._seq,r._newEnd,r._follow!==false);r.내용=`${short(r.공정)} 끝 ${md(r._newEnd)}로 연장${res&&res.moved?' · 뒤 공정 '+res.moved+'개 이동':''}`;}
     if((r.유형==='공정 시작'||r.유형==='날짜 변경')&&r._seq&&r._newEnd){const res=LOCAL.shiftProc(r.현장ID,r._seq,r._newEnd,r._follow!==false,r.일시.slice(0,10));const p=procAt(r.현장ID,r._seq);if(p)p.상태='진행';r.내용=`${r.공정} ${md(r.일시)} ~ ${md(r._newEnd)}${res&&res.moved?' · 뒤 공정 '+res.moved+'개 이동':''}${r.내용?' · '+r.내용:''}`;}
     delete r._seq;delete r._newEnd;delete r._follow;D.records.push(r);return r.ID;},
   addPhoto(id,p){const r=D.records.find(x=>x.ID===id);if(r&&p.thumb)r.사진=(r.사진?String(r.사진).split('|').filter(Boolean):[]).concat(p.thumb).join('|');},
@@ -307,6 +312,9 @@ const LOCAL={
   deleteRecord(id){D.records=D.records.filter(r=>r.ID!==id);},
   addTeam(t){if(teamById(t.팀ID))return t.팀ID;D.teams.push(t);return t.팀ID;},
   videoDone(rid,fid){const r=D.records.find(x=>x.ID===rid);if(!r)return;const a=r.사진?String(r.사진).split('|').filter(Boolean):[];if(!a.includes('v:'+fid))a.push('v:'+fid);r.사진=a.join('|');},
+  addBiz(b){D.biz=D.biz||[];if(!D.biz.some(x=>x.ID===b.ID))D.biz.push(b);return b.ID;},
+  updateBiz(id,p){Object.assign((D.biz||[]).find(x=>x.ID===id)||{},p);},
+  deleteBiz(id){D.biz=(D.biz||[]).filter(x=>x.ID!==id);},
   addTodo(t){D.todos=D.todos||[];if(D.todos.some(x=>x.ID===t.ID))return t.ID;const s=siteById(t.현장ID);if(!s)throw new Error('현장을 고르세요');t.현장=s.고객명;D.todos.push(t);if(t.완료)todoRec(t);return t.ID;},
   updateTodo(id,p){const t=(D.todos||[]).find(x=>x.ID===id);if(!t)return;const q={...p},when=q._t;delete q._t;if(q.현장ID){const s=siteById(q.현장ID);if(s)q.현장=s.고객명;}Object.assign(t,q);if(t.현장ID)todoRec(t,when);},
   deleteTodo(id){D.todos=(D.todos||[]).filter(x=>x.ID!==id);D.records=D.records.filter(r=>r.ID!=='rt-'+id);},
@@ -351,7 +359,7 @@ function render(){
   const v=S.view,nav=$('#nav');
   nav.style.display=v==='site'?'':'none';$('#bbar').style.display='none';
   if(v==='site')nav.innerHTML=[['기록','📝','기록'],['공정','📋','공정표·정보']].map(([k,i,n])=>`<div class="${S.tab===k?'on':''}" onclick="S.tab='${k}';render();$('#main').scrollTop=0"><b>${i}</b>${n}</div>`).join('');
-  ({today:renderHome,sites:renderHome,cal:renderCal,site:renderSite,teams:renderTeams})[v]();
+  ({today:renderHome,sites:renderHome,cal:renderCal,site:renderSite,teams:renderTeams,biz:renderBiz})[v]();
   fitAll();
   if(v==='cal')$('#hd').insertAdjacentHTML('afterbegin','<button class="bk" onclick="back()">‹ 뒤로</button>');
 }
@@ -382,6 +390,64 @@ const CH="data:image/webp;base64,UklGRnopAABXRUJQVlA4WAoAAAAQAAAAgAAA7wAAQUxQSAg
 const chImg=()=>`<img class="cz" alt="" src="${CH}">`;
 
 // ---- 오늘 ----
+// ============ 사업 일정 (현장과 별개, 대표님이 챙길 세금·회사 일) ============
+// 반복: 한번(날짜) · 매월(일) · 매년(월 여러 개 + 일). 주말이면 다음 근무일. 완료 = 끝낸 회차 키(yyyymmdd) 목록
+const bkey=d=>ds(d).replace(/-/g,'');
+const toWork=d=>{d=new Date(d);while(!isWork(d))d.setDate(d.getDate()+1);return d};
+const bizDone=b=>new Set(String(b.완료||'').split(',').filter(Boolean));
+function bizOccs(b,from,to){
+  if(b.반복==='한번'){if(!b.날짜)return [];const d=pd(b.날짜);return [{key:bkey(d),base:d,due:toWork(d)}];}
+  const ms=b.반복==='매월'?[1,2,3,4,5,6,7,8,9,10,11,12]:String(b.월||'').split(',').map(Number).filter(m=>m>=1&&m<=12),out=[];
+  for(let y=from.getFullYear();y<=to.getFullYear();y++)for(const m of ms){const d=new Date(y,m-1,Math.min(+b.일||1,new Date(y,m,0).getDate()));if(d>=from&&d<=to)out.push({key:bkey(d),base:d,due:toWork(d)});}
+  return out.sort((a,b)=>a.base-b.base);
+}
+function bizNext(b){const from=pd(b.시작||D.today),to=pd(D.today);to.setFullYear(to.getFullYear()+2);const dn=bizDone(b);return bizOccs(b,from,to).find(o=>!dn.has(o.key))||null;}
+const dLabel=d=>{const n=daysBetween(D.today,ds(d));return n===0?'오늘':n<0?`${-n}일 지남`:`D-${n}`;};
+const repLabel=b=>b.반복==='한번'?'한 번':b.반복==='매월'?`매월 ${b.일}일`:`매년 ${String(b.월).split(',').join('·')}월 ${b.일}일`;
+function bizAlert(){
+  const l=(D.biz||[]).map(b=>({b,o:bizNext(b)})).filter(x=>x.o&&daysBetween(D.today,ds(x.o.due))<=3).sort((a,b)=>a.o.due-b.o.due);
+  return l.length?`<div class="bizal" onclick="go('biz')">${l.map(x=>`<div><b class="${daysBetween(D.today,ds(x.o.due))<0?'r':''}">${dLabel(x.o.due)}</b> ${esc(x.b.제목)}</div>`).join('')}</div>`:'';
+}
+function renderBiz(){
+  $('#hd').innerHTML=`<button class="bk" onclick="back()">‹ 뒤로</button><div class="row"><span class="d">사업 일정</span><button onclick="openBiz()">＋ 추가</button></div><div class="sub">현장과 별개로 챙길 회사 일 · 주말이면 다음 근무일</div>`;
+  const rows=(D.biz||[]).map(b=>({b,o:bizNext(b)})),up=rows.filter(x=>x.o).sort((a,b)=>a.o.due-b.o.due);
+  const since=pd(D.today);since.setDate(since.getDate()-45);
+  const until=pd(D.today);until.setDate(until.getDate()+400);
+  const done=[];(D.biz||[]).forEach(b=>{const dn=bizDone(b);bizOccs(b,since,until).forEach(o=>{if(dn.has(o.key)&&o.due>=since)done.push({b,o});});}); // 45일 안에 끝낸 회차 (미리 끝낸 것 포함)
+  let h=up.map(({b,o})=>{const n=daysBetween(D.today,ds(o.due)),moved=bkey(o.due)!==o.key;
+    return `<div class="todo"><div class="cb" onclick="bizCheck('${b.ID}','${o.key}',1)"><i></i></div><div class="x" onclick="openBiz('${b.ID}')"><b>${esc(b.제목)}</b><small><span class="${n<0?'r':n<=3?'w':''}">${dLabel(o.due)}</span> · ${md(ds(o.due))} (${dow(ds(o.due))})${moved?` · 원래 ${md(ds(o.base))} 주말`:''} · ${repLabel(b)}</small></div></div>`;}).join('');
+  h=`<div class="card">${h||`<div class="empty">${chImg()}사업 일정이 없습니다.<br>위 ＋ 추가로 넣으세요</div>`}</div>`;
+  if(done.length)h+=`<h2>최근 끝낸 일</h2><div class="card">${done.sort((a,b)=>b.o.due-a.o.due).map(({b,o})=>`<div class="todo ok"><div class="cb" onclick="bizCheck('${b.ID}','${o.key}',0)"><i></i></div><div class="x"><b>${esc(b.제목)}</b><small>${md(ds(o.due))} · 눌러서 되돌리기</small></div></div>`).join('')}</div>`;
+  h+=`<div class="note" style="margin:0 1rem">기본 목록은 12월 결산 법인 기준입니다. 세무사님께 확인 후 맞지 않는 건 눌러서 고치거나 지우세요. 공휴일은 반영하지 않습니다.</div>`;
+  $('#main').innerHTML=h;
+}
+async function bizCheck(id,key,on){const b=(D.biz||[]).find(x=>x.ID===id);if(!b)return;const dn=bizDone(b);on?dn.add(key):dn.delete(key);
+  await api('updateBiz',id,{완료:[...dn].sort().join(',')+(dn.size?',':'')});toast(on?'끝냈습니다 · 다음 회차가 잡혔어요':'되돌렸습니다');render();}
+const BZ={};
+function openBiz(id){const b=id?(D.biz||[]).find(x=>x.ID===id):null;Object.assign(BZ,b?{id,제목:b.제목,반복:b.반복,월:String(b.월||''),일:b.일,날짜:b.날짜,메모:b.메모}:{id:'',제목:'',반복:'매년',월:'',일:'',날짜:D.today,메모:''});drawBiz();}
+function bizKeep(){['제목','일','날짜','메모'].forEach(k=>{const e=$('#bz_'+k);if(e)BZ[k]=e.value.trim();});}
+function drawBiz(){
+  const ms=String(BZ.월).split(',').filter(Boolean);
+  openSheet(`<div class="t">${BZ.id?'사업 일정 고치기':'사업 일정 추가'}</div>
+    <label class="l">할 일 *</label><input class="in" id="bz_제목" value="${esc(BZ.제목)}" placeholder="예: 부가세 자료 세무사에 보내기">
+    <label class="l">반복</label><div class="seg">${['한번','매월','매년'].map(r=>`<span class="${BZ.반복===r?'on':''}" onclick="bizKeep();BZ.반복='${r}';drawBiz()">${r==='한번'?'한 번':r}</span>`).join('')}</div>
+    ${BZ.반복==='한번'?`<label class="l">날짜</label><input type="date" class="in" id="bz_날짜" value="${BZ.날짜||''}">`
+      :`${BZ.반복==='매년'?`<label class="l">몇 월 (여러 개 가능)</label><div class="chips" style="padding:0">${[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>`<span class="${ms.includes(String(m))?'on':''}" onclick="bizKeep();bizMonth(${m})">${m}월</span>`).join('')}</div>`:''}
+        <label class="l">며칠</label><input class="in" id="bz_일" inputmode="numeric" value="${BZ.일||''}" placeholder="예: 10 (말일이 짧은 달은 그 달 말일)">`}
+    <label class="l">메모</label><input class="in" id="bz_메모" value="${esc(BZ.메모||'')}">
+    <button class="save" onclick="saveBiz()">저장</button>${BZ.id?`<button class="ghost danger" onclick="if(confirm('이 일정을 지울까요?'))delBiz('${BZ.id}')">지우기</button>`:''}`);
+}
+function bizMonth(m){const ms=new Set(String(BZ.월).split(',').filter(Boolean));ms.has(String(m))?ms.delete(String(m)):ms.add(String(m));BZ.월=[...ms].map(Number).sort((a,b)=>a-b).join(',');drawBiz();}
+async function saveBiz(){bizKeep();
+  if(!BZ.제목)return toast('할 일을 쓰세요');
+  if(BZ.반복==='한번'&&!BZ.날짜)return toast('날짜를 고르세요');
+  if(BZ.반복!=='한번'&&!(+BZ.일>=1&&+BZ.일<=31))return toast('며칠인지 1~31로 쓰세요');
+  if(BZ.반복==='매년'&&!BZ.월)return toast('몇 월인지 고르세요');
+  const p={제목:BZ.제목,반복:BZ.반복,월:BZ.반복==='매년'?BZ.월:'',일:BZ.반복==='한번'?'':+BZ.일,날짜:BZ.반복==='한번'?BZ.날짜:'',메모:BZ.메모};
+  if(BZ.id)await api('updateBiz',BZ.id,p);else await api('addBiz',{...p,시작:D.today,완료:''});
+  closeSheet();toast('저장됨');render();}
+async function delBiz(id){await api('deleteBiz',id);closeSheet();render();}
+
 // ---- 할 일 (현장 · 일자 · 할 일) ----
 const todoSite=t=>D.sites.find(s=>t.현장ID?s.현장ID===t.현장ID:s.고객명===t.현장)||null;
 function todoRec(t,when){const rid='rt-'+t.ID,i=D.records.findIndex(r=>r.ID===rid);
@@ -416,7 +482,7 @@ function renderHome(){
     else if(b.curs.length)lines=b.curs.map(c=>{const {i,n}=dur(c);return short(c.공정)+(n>1?' '+i+'/'+n+'일':'')+(c.담당팀?' · '+teamName(c.담당팀):'');});
     else lines=[b.main.replace(/<[^>]+>/g,'')];
     return `<div class="tile" style="background:${x.색}" onclick="go('site','${x.현장ID}')"><div><div class="n fit">${esc(x.고객명)}</div>${x.평형?`<div class="t fit">${esc(x.평형)}</div>`:''}${b.warn.length?`<span class="w">⚠ 늦은 공정 ${b.warn.length}</span>`:''}</div><div><big>${b.total?b.pct+'%':x.상태}</big>${lines.map(l=>`<div class="t fit">${esc(l)}</div>`).join("")}</div></div>`;};
-  let h=`<div class="top2"><div onclick="go('cal')">📅 달력</div><div onclick="go('teams')">👷 시공팀</div></div><div class="tiles">${act.map(tile).join('')}<div class="tile add" onclick="openSiteForm()"><div style="font-size:2.4rem">＋</div><div>새 현장</div></div></div>`;
+  let h=`<div class="top2 t3"><div class="fit" onclick="go('cal')">📅 달력</div><div class="fit" onclick="go('teams')">👷 시공팀</div><div class="fit" onclick="go('biz')">📋 사업 일정</div></div>${bizAlert()}<div class="tiles">${act.map(tile).join('')}<div class="tile add" onclick="openSiteForm()"><div style="font-size:2.4rem">＋</div><div>새 현장</div></div></div>`;
   const orphan=(D.todos||[]).filter(t=>!todoSite(t));
   if(orphan.length)h+=`<div class="warn2">⚠ 현장이 연결되지 않은 할 일 ${orphan.length}개</div><div class="card">${orphan.map(todoRow).join('')}</div>`;
   const tl=(D.todos||[]).filter(t=>t.일자===D.today||(t.일자<D.today&&!t.완료)).sort((a,b)=>a.일자<b.일자?-1:1);
@@ -513,7 +579,7 @@ function timeline(s){
     return `<h2>${d===D.today?'오늘 · ':''}${md(d)} ${dow(d)}요일${pn?' · '+pn:''}</h2><div class="card">${groups[d].map(r=>recHtml(r)).join('')}</div>`;}).join('');
 }
 function recHtml(r,withSite){
-  const ico=Object.fromEntries(TYPES)[r.유형]||(r.유형==='할 일'?'☑️':'•');
+  const ico=ICON[r.유형]||'•';
   const pics=r.사진||Object.values(VJ).some(j=>j.rid===r.ID)?`<div class="pics">${String(r.사진||'').split('|').filter(id=>id&&!id.startsWith('v:')).map(id=>`<img src="${thumb(id)}" onclick="event.stopPropagation();openPhoto('${id}')">`).join('')}${vidChips(r)}</div>`:'';
   const sub=r.유형==='투입'?` · ${esc(teamName(r.팀ID))} ${r.단가?won(r.단가)+'×':''}${r.공수} · ${won(r.금액)}원${r.지급?' ✓지급':''}`:'';
   const when=(r.일시.slice(0,10)===D.today?'오늘 ':md(r.일시)+' ')+r.일시.slice(11);
@@ -526,7 +592,7 @@ function procList(s){
   return `<div style="margin:0 .75rem .6rem;display:flex;gap:.5rem"><button class="save" style="margin:0;flex:1" onclick="openSchedule('${s.현장ID}')">📅 일정 잡기${nodate?` · 미정 ${nodate}`:''}</button><button class="save" style="margin:0;width:auto;background:var(--plum)" onclick="openAddProc('${s.현장ID}')">＋ 공정</button></div>
     <div class="card pl">${ps.map(p=>`<div class="row" onclick="openProc('${s.현장ID}',${p.순번})" style="${p.상태==='제외'?'opacity:.4':''}"><span style="display:flex;align-items:center;min-width:0"><i class="dot ${p.상태==='완료'?'g':p.상태==='진행'?'r':late(p)?'x':''}"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.순번} ${esc(p.공정)}</span></span>
     <span class="s" style="white-space:nowrap">${p.상태==='제외'?'제외':p.시작?`${p.담당팀?esc(teamName(p.담당팀))+' · ':''}${md(p.시작)}${p.시작!==p.끝?'~'+md(p.끝):''}`:'<span style="color:#bbb">날짜 없음</span>'} ${late(p)?'<span class="tag red">늦음</span>':p.상태==='진행'?'<span class="tag">진행</span>':''}</span></div>`).join('')}</div>
-    <div class="note" style="margin:0 1rem">공정을 누르면 상태·담당팀·날짜를 바꿀 수 있고, 끝 날짜를 바꾸면 뒤 공정이 같이 밀립니다.</div>`;
+    <div class="note" style="margin:0 1rem">공정을 누르면 ▶ 시작 · ✓ 끝 · ＋1일 연장을 바로 할 수 있어요.</div>`;
 }
 
 // ---- 일정 잡기: 공정별 시작~끝을 대표님이 직접 ----
@@ -566,18 +632,20 @@ function scStandard(){
 }
 function openAddProc(siteId,v){ // v: 팀 추가 후 돌아올 때 입력값 복원
   v=v||{};const ps=procsOf(siteId);
-  openSheet(`<div class="t">공정 추가</div><label class="l">공정 이름 *</label><input class="in" id="ap_name" list="ap_list" value="${esc(v.name||'')}" placeholder="예: 타일, 목공, 탄성코트"><datalist id="ap_list">${D.base.procs.map(p=>`<option value="${esc(p.공정)}">`).join('')}</datalist>
+  openSheet(`<div class="t">공정 추가</div><label class="l">공정 이름 *</label><input class="in" id="ap_name" list="ap_list" value="${esc(v.name||'')}" placeholder="예: 타일, 목공, 탄성코트"><datalist id="ap_list">${ps.filter(p=>!p.시작&&p.상태!=='제외').map(p=>`<option value="${esc(p.공정)}">`).join('')}</datalist>
     <label class="l">맡은 팀</label><select class="in" id="ap_team" onchange="if(this.value==='__new'){const v={name:val('ap_name'),after:val('ap_after'),s:val('ap_s'),e:val('ap_e')};R.after=id=>openAddProc('${siteId}',Object.assign(v,{team:id}));openTeamForm();}">${opt(D.teams,v.team||'',t=>t.팀명+(t.공종?' · '+t.공종:''),t=>t.팀ID,'— 아직 없음')}<option value="__new">＋ 새 팀 추가…</option></select>
     <label class="l">시작 · 끝</label><div class="dates"><input type="date" class="in" id="ap_s" value="${v.s||''}"><input type="date" class="in" id="ap_e" value="${v.e||''}"></div>
     <label class="l">순서 (어디 뒤에)</label><select class="in" id="ap_after">${opt(ps,v.after!==undefined?v.after:(ps.length?ps[ps.length-1].순번:''),p=>p.순번+' '+p.공정+' 뒤',p=>p.순번)}<option value="">맨 앞</option></select>
-    <div class="note">같은 기간에 여러 공정이 겹쳐도 됩니다. 팀·날짜는 나중에 공정표에서 바꿀 수 있어요.</div>
+    <div class="note">공정표에 있는 이름(날짜 없는 공정)을 쓰면 그 공정에 팀·날짜가 들어가고, 새 이름이면 공정이 새로 생깁니다. 같은 기간에 여러 공정이 겹쳐도 됩니다.</div>
     <button class="save" onclick="saveAddProc('${siteId}')">추가</button>`);
 }
 async function saveAddProc(siteId){
   const name=val('ap_name');if(!name)return toast('공정 이름을 쓰세요');
   const team=val('ap_team')==='__new'?'':val('ap_team'),st=val('ap_s'),en=val('ap_e')||st;
-  await api('addProc',siteId,name,val('ap_after'),{담당팀:team,시작:st,끝:en});
-  closeSheet();toast(name+' 추가됨');render();
+  const ex=procsOf(siteId).find(p=>p.공정===name&&!p.시작&&p.상태!=='제외'); // 표준 공정이 이미 있으면 거기에 채움
+  if(ex){await api('updateProc',siteId,ex.순번,{담당팀:team});if(st)await api('shiftProc',siteId,ex.순번,en,false,st);}
+  else await api('addProc',siteId,name,val('ap_after'),{담당팀:team,시작:st,끝:en});
+  closeSheet();toast(name+(ex?' 일정 넣음':' 추가됨'));render();
 }
 async function saveSchedule(){
   const rows=SC.rows.map(r=>({순번:r.순번,시작:r.시작,끝:r.끝||r.시작,상태:r.상태}));
@@ -695,15 +763,11 @@ function drawRec(){
   const el=$('#rec');el.classList.add('on');const act=activeSites();let h='';
   if(R.step===1)h=recHead(1,'기록하기')+`<div class="rbody"><div class="q">어느 현장인가요?</div>${act.map(x=>`<div class="opt ${x.현장ID===R.site?'on':''}" onclick="R.site='${x.현장ID}';R.step=2;drawRec()"><i style="background:${x.색}"></i>${esc(x.고객명)} ${esc(x.평형||'')}</div>`).join('')}</div><div class="rfoot"><div class="back" onclick="closeRec()">닫기</div></div>`;
   else if(R.step===2)h=recHead(2,'기록하기')+`<div class="rbody"><div class="q">무슨 기록인가요?</div><div class="grid2">${TYPES.map(([t,i])=>`<div class="opt ${R.type===t?'on':''}" onclick="R.type='${t}';R.step=3;drawRec()"><em>${i}</em>${t}</div>`).join('')}</div></div><div class="rfoot"><div class="back" onclick="${act.length>1?'R.step=1;drawRec()':'closeRec()'}">‹ ${act.length>1?'현장 다시 고르기':'닫기'}</div></div>`;
-  else h=recHead(3,(Object.fromEntries(TYPES)[R.type]||'')+' '+R.type)+`<div class="rbody">${recFields()}</div><div class="rfoot"><button class="save" id="r_save" onclick="saveRecord()">저장</button><div class="back" onclick="R.step=2;drawRec()">‹ 종류 다시 고르기</div></div>`;
+  else h=recHead(3,(ICON[R.type]||'')+' '+R.type)+`<div class="rbody">${recFields()}</div><div class="rfoot"><button class="save" id="r_save" onclick="saveRecord()">저장</button><div class="back" onclick="R.step=2;drawRec()">‹ 종류 다시 고르기</div></div>`;
   el.innerHTML=h;const body=el.querySelector('.rbody');if(body)body.scrollTop=0;
 }
 function recFields(){
   const ps=liveOf(R.site), cp=curProc(R.site,D.today);let f='';
-  if(R.type==='공정 끝'){const def=ps.find(p=>p.상태==='진행')||ps.find(p=>p.상태!=='완료');f=`<label class="l">끝난 공정</label><select class="in" id="r_proc">${opt(ps.filter(p=>p.상태!=='완료'),def?.순번,p=>p.순번+' '+p.공정+(p.시작?' ('+md(p.시작)+'~'+md(p.끝)+')':''),p=>p.순번)}</select>`;}
-  if(R.type==='공정 시작'){const def=ps.find(p=>p.상태==='진행')||ps.find(p=>p.상태!=='완료');f=`<label class="l">오늘 ${md(D.today)} 시작하는 공정</label><select class="in" id="r_proc" onchange="shiftPreview()">${opt(ps.filter(p=>p.상태!=='완료'),def?.순번,p=>p.순번+' '+p.공정,p=>p.순번)}</select>
-    <label class="l">끝나는 날짜 (직접 선택)</label><input type="date" class="in" id="r_date" value="" min="${D.today}" onchange="shiftPreview()">
-    <div class="tog ${R.follow?'on':''}" onclick="R.follow=!R.follow;this.classList.toggle('on');shiftPreview()"><span>뒤 공정 같이 밀기</span><i></i></div><div class="note" id="r_prev"></div>`;}
   if(R.type==='현장 점검')f=`<label class="l">확인한 항목 (눌러서 ✓)</label><div class="chips" id="r_chk">${D.base.lists.점검항목.map(c=>`<span class="${R.checks[c]?'on':''}" onclick="R.checks['${c}']=!R.checks['${c}'];this.classList.toggle('on')">${c}</span>`).join('')}</div>`;
   if(R.type==='제품 선택')f=`<label class="l">품목</label><input class="in" id="r_item" placeholder="예: 욕실 타일, 주방 상판, 중문"><label class="l">고객이 고른 제품 · 색상</label><input class="in" id="r_prod" placeholder="예: LX 지인 베이지 300×600"><label class="l">관련 공정</label><select class="in" id="r_proc">${opt(ps,cp?.순번,p=>p.공정,p=>p.순번,'—')}</select>`;
   const txtLabel={'공정 끝':'메모 (선택)','공정 시작':'메모 (선택)','현장 점검':'보류·문제 (선택)','특이사항':'무슨 일인가요?','고객 대화':'제목 한 줄','제품 선택':'메모 (선택)'}[R.type];
@@ -714,27 +778,22 @@ function recFields(){
     +(MEDIA[R.type]?photoBtns(MEDIA[R.type]):'')
     +(R.type!=='고객 대화'?`<div class="more" onclick="$('#r_detail').style.display='block';this.style.display='none'"><span>자세히 쓰기 (원인·조치·금액)</span><span>⌄</span></div><textarea class="in" id="r_detail" style="display:none;margin-top:.5rem"></textarea>`:'');
 }
-function simShift(siteId,seq,newEnd,follow,newStart){ // 서버 shiftProc 과 같은 계산 (미리보기·목업용)
-  const ps=procsOf(siteId).map(p=>({...p}));const t=ps.find(p=>+p.순번===+seq);if(!t)return null;
-  if(!newEnd||!(newStart||t.시작))return null;let end=pd(newEnd),start=pd(newStart||t.시작);if(end<start)start=end;t.시작=ds(start);t.끝=ds(end);let cursor=end,moved=0;
-  if(follow)ps.filter(p=>+p.순번>+seq&&dated(p)&&p.상태!=='완료').forEach(p=>{const dur=workdays(pd(p.시작),pd(p.끝));const st=nextWork(cursor),en=addWork(st,dur-1);if(ds(st)!==p.시작||ds(en)!==p.끝){p.시작=ds(st);p.끝=ds(en);moved++;}cursor=en;});
+const shiftWork=(d,n)=>{d=new Date(d);const sg=n<0?-1:1;n=Math.abs(n);while(n>0){d.setDate(d.getDate()+sg);if(isWork(d))n--;}return d};
+function simShift(siteId,seq,newEnd,follow,newStart){ // 서버 shiftProc 과 같은 계산 (미리보기·화면 즉시 반영)
+  const ps=procsOf(siteId).map(p=>({...p}));const t=ps.find(p=>+p.순번===+seq);if(!t||!newEnd)return null;
+  const oldEnd=t.끝,end=pd(newEnd);let start=pd(newStart||t.시작||newEnd);if(end<start)start=end;t.시작=ds(start);t.끝=ds(end);let moved=0;
+  if(follow&&oldEnd){const oe=pd(oldEnd),delta=end>oe?workdays(shiftWork(oe,1),end):end<oe?-workdays(shiftWork(end,1),oe):0;
+    if(delta)ps.filter(p=>p!==t&&dated(p)&&p.상태!=='완료'&&p.시작>oldEnd).forEach(p=>{p.시작=ds(shiftWork(pd(p.시작),delta));p.끝=ds(shiftWork(pd(p.끝),delta));moved++;});}
   return {procs:ps,moved,준공예정:ps.filter(dated).map(p=>p.끝).sort().pop()||''};
-}
-function shiftPreview(){
-  const s=siteById(R.site),r=simShift(R.site,val('r_proc'),val('r_date'),R.follow,D.today);if(!r){$('#r_prev').textContent='';return;}
-  const conf=[];r.procs.filter(p=>p.담당팀).forEach(p=>D.procs.filter(q=>q.현장ID!==R.site&&q.담당팀===p.담당팀&&q.시작<=p.끝&&p.시작<=q.끝).forEach(q=>conf.push(`${teamName(p.담당팀)} ${md(p.시작)} ${siteById(q.현장ID)?.고객명}과 겹침`)));
-  $('#r_prev').innerHTML=`${md(D.today)} ~ ${md(val('r_date'))} · 뒤 공정 ${r.moved}개 이동 · 준공예정 ${md(s.준공예정)} → <b>${md(r.준공예정)}</b> · 📷 애프터 ${md(r.준공예정)}${conf.length?`<div class="note warn" style="margin-top:6px">⚠️ ${[...new Set(conf)].join('<br>')}</div>`:''}`;
 }
 async function saveRecord(){
   const r={현장ID:R.site,유형:R.type,내용:val('r_text'),상세:val('r_detail'),사진:'',팀ID:'',공수:'',금액:'',공정:'',지급:'',단가:''};
   const ps=procsOf(R.site),pr=ps.find(p=>+p.순번===+val('r_proc'));
-  if(R.type==='공정 끝'){if(!pr)return toast('공정을 고르세요');r.공정=pr.공정;r._seq=pr.순번;r.내용=r.내용||`${pr.공정} 완료`;}
-  if(R.type==='공정 시작'){if(!pr||!val('r_date'))return toast('공정과 끝나는 날짜를 고르세요');r.공정=pr.공정;r._seq=pr.순번;r._newEnd=val('r_date');r._follow=R.follow;}
   if(R.type==='현장 점검'){const ok=Object.keys(R.checks).filter(k=>R.checks[k]);r.내용=(ok.length?ok.join(' ✓ ')+' ✓':'')+(r.내용?(ok.length?' · ':'')+'보류: '+r.내용:'');if(!r.내용)return toast('항목을 체크하세요');}
   if(R.type==='제품 선택'){if(!val('r_item')||!val('r_prod'))return toast('품목과 제품을 쓰세요');r.공정=pr?.공정||'';r.내용=`${val('r_item')}: ${val('r_prod')}`+(r.내용?' · '+r.내용:'');}
   if((R.type==='특이사항'||R.type==='고객 대화')&&!r.내용&&!r.상세&&!PH.length&&!VID.length)return toast('내용을 쓰거나 사진·영상을 넣으세요');
   const snap={site:R.site,procs:procsOf(R.site).map(p=>({순번:p.순번,시작:p.시작,끝:p.끝,상태:p.상태}))};
-  const restore=R.type==='공정 끝'||R.type==='공정 시작';
+  const restore=false;
   $('#r_save').disabled=true;
   const photos=PH.slice(),vids=VID.slice();
   const id=await api('addRecord',r,[]);                       // 기록 먼저
@@ -777,17 +836,37 @@ async function saveRecordEdit(id){
 async function delRecord(id){if(!confirm('삭제할까요?'))return;await api('deleteRecord',id);closeSheet();toast('삭제됨');render();}
 
 // ---- 공정 편집 ----
-function openProc(siteId,seq){
-  const p=procsOf(siteId).find(x=>+x.순번===+seq);R.follow=true;
-  openSheet(`<div class="t">${p.순번} ${esc(p.공정)}</div><div class="s">${p.시작?md(p.시작)+' ~ '+md(p.끝):'날짜 없음'} · ${p.상태}${late(p)?' · <b style="color:var(--red)">지연</b>':''}</div>
-    <label class="l">상태</label><div class="seg" id="p_st">${['예정','진행','완료','보류','제외'].map(s=>`<span class="${p.상태===s?'on':''}" onclick="$$('#p_st span').forEach(e=>e.classList.toggle('on',e===this))">${s}</span>`).join('')}</div>
-    <label class="l">담당팀</label><select class="in" id="p_team" onchange="if(this.value==='__new'){const st=$('#p_st .on')?.textContent,a=val('p_start'),b=val('p_end');R.after=id=>{openProc('${siteId}',${seq});$('#p_team').value=id;if(st)$$('#p_st span').forEach(e=>e.classList.toggle('on',e.textContent===st));$('#p_start').value=a;$('#p_end').value=b;};openTeamForm();}">${opt(D.teams,p.담당팀,t=>t.팀명+(t.공종?' · '+t.공종:''),t=>t.팀ID,'— 없음')}<option value="__new">＋ 새 팀 추가…</option></select>
+function openProc(siteId,seq,keep){
+  const p=procsOf(siteId).find(x=>+x.순번===+seq);if(!p)return;if(!keep)R.follow=true;
+  const st=p.상태,team=p.담당팀?teamName(p.담당팀):'',pv=`procPreview('${siteId}',${seq});extPreview('${siteId}',${seq})`;
+  openSheet(`<div class="t">${p.순번} ${esc(p.공정)}</div><div class="s">${p.시작?md(p.시작)+' ~ '+md(p.끝):'날짜 없음'} · ${st}${late(p)?' · <b style="color:var(--red)">지연</b>':''}${team?' · '+esc(team):''}</div>
+    <div class="pbig">${(st==='예정'||st==='보류')?`<button class="big go" onclick="procAct('${siteId}',${seq},'start')">▶ 오늘 시작</button>`:''}${st==='완료'?`<button class="big undo" onclick="procAct('${siteId}',${seq},'reopen')">↩ 완료 취소</button>`:`<button class="big ok" onclick="procAct('${siteId}',${seq},'end')">✓ 오늘 끝</button>`}</div>
+    ${st==='완료'?'':`<button class="big ext" onclick="procAct('${siteId}',${seq},'ext')">＋1일 연장</button><div class="note" id="p_ext"></div>`}
+    <div class="tog ${R.follow?'on':''}" id="p_follow" onclick="R.follow=!R.follow;this.classList.toggle('on');${pv}"><span>끝이 바뀌면 뒤 공정도 같이 밀기</span><i></i></div>
+    <div class="sub2">직접 고치기</div>
+    <label class="l">상태</label><div class="seg" id="p_st">${['예정','진행','완료','보류','제외'].map(x=>`<span class="${p.상태===x?'on':''}" onclick="$$('#p_st span').forEach(e=>e.classList.toggle('on',e===this))">${x}</span>`).join('')}</div>
+    <label class="l">담당팀</label><select class="in" id="p_team" onchange="if(this.value==='__new'){const st=$('#p_st .on')?.textContent,a=val('p_start'),b=val('p_end');R.after=id=>{openProc('${siteId}',${seq},true);$('#p_team').value=id;if(st)$$('#p_st span').forEach(e=>e.classList.toggle('on',e.textContent===st));$('#p_start').value=a;$('#p_end').value=b;};openTeamForm();}">${opt(D.teams,p.담당팀,t=>t.팀명+(t.공종?' · '+t.공종:''),t=>t.팀ID,'— 없음')}<option value="__new">＋ 새 팀 추가…</option></select>
     <label class="l">시작</label><input type="date" class="in" id="p_start" value="${p.시작}">
-    <label class="l">끝</label><input type="date" class="in" id="p_end" value="${p.끝}" onchange="procPreview('${siteId}',${seq})">
-    <div class="tog on" id="p_follow" onclick="R.follow=!R.follow;this.classList.toggle('on');procPreview('${siteId}',${seq})"><span>끝 날짜 바꾸면 뒤 공정 같이 밀기</span><i></i></div><div class="note" id="p_prev"></div>
+    <label class="l">끝</label><input type="date" class="in" id="p_end" value="${p.끝}" onchange="procPreview('${siteId}',${seq})"><div class="note" id="p_prev"></div>
     <button class="save" onclick="saveProc('${siteId}',${seq},'${p.끝}')">저장</button><button class="ghost danger" onclick="if(confirm('이 공정을 지울까요?')){api('deleteProc','${siteId}',${seq}).then(()=>{closeSheet();render()})}">공정 삭제</button>`);
+  extPreview(siteId,seq);
 }
-function procPreview(siteId,seq){const s=siteById(siteId),r=simShift(siteId,seq,val('p_end'),R.follow);if(r)$('#p_prev').textContent=`뒤 공정 ${r.moved}개 이동 · 준공예정 ${md(s.준공예정)} → ${md(r.준공예정)}`;}
+function extPreview(siteId,seq){const el=$('#p_ext'),p=procAt(siteId,seq);if(!el||!p)return;const ne=p.끝?ds(nextWork(pd(p.끝))):D.today,r=simShift(siteId,seq,ne,R.follow),s=siteById(siteId);
+  if(r)el.innerHTML=`누르면 끝 ${p.끝?md(p.끝):'—'} → <b>${md(ne)}</b>${R.follow&&r.moved?` · 뒤 공정 ${r.moved}개 이동`:''} · 준공예정 ${s.준공예정?md(s.준공예정):'—'} → <b>${md(r.준공예정)}</b>`;}
+// 공정 관리창 버튼: 기록은 자동으로 남고(시작·끝·연장), 시작·끝은 5초 안에 취소할 수 있음
+async function procAct(siteId,seq,kind){
+  const p=procAt(siteId,seq);if(!p)return;const today=D.today;
+  const snap={site:siteId,procs:procsOf(siteId).map(q=>({순번:q.순번,시작:q.시작,끝:q.끝,상태:q.상태}))};
+  const rec=(유형,x)=>api('addRecord',{현장ID:siteId,유형,내용:'',상세:'',사진:'',팀ID:'',공수:'',금액:'',공정:p.공정,지급:'',단가:'',_seq:seq,...x},[]);
+  if(kind==='ext'){const ne=p.끝?ds(nextWork(pd(p.끝))):today;await rec('공정 연장',{_newEnd:ne,_follow:R.follow});toast(`${short(p.공정)} 끝 ${md(ne)}로 연장`);render();openProc(siteId,seq,true);return;}
+  if(kind==='reopen'){const last=D.records.filter(r=>r.현장ID===siteId&&r.유형==='공정 끝'&&r.공정===p.공정).sort((a,b)=>a.일시<b.일시?1:-1)[0];
+    await api('updateProc',siteId,seq,{상태:'진행'});if(last)await api('deleteRecord',last.ID);toast('완료를 취소했습니다');render();openProc(siteId,seq,true);return;}
+  let id;
+  if(kind==='start')id=await rec('공정 시작',{_newEnd:(p.끝&&p.끝>=today)?p.끝:today,_follow:false});
+  else id=await rec('공정 끝',{_newEnd:today,_follow:R.follow,내용:`${p.공정} 완료`});
+  closeSheetKeep();navBack('sheet');render();showDone(id,snap,true,0,0);
+}
+function procPreview(siteId,seq){const s=siteById(siteId),r=val('p_end')?simShift(siteId,seq,val('p_end'),R.follow):null;if(r)$('#p_prev').textContent=`뒤 공정 ${r.moved}개 이동 · 준공예정 ${md(s.준공예정)} → ${md(r.준공예정)}`;}
 async function saveProc(siteId,seq,oldEnd){
   const st=$('#p_st .on')?.textContent, p={상태:st,담당팀:val('p_team')==='__new'?'':val('p_team'),시작:val('p_start')};
   await api('updateProc',siteId,seq,p);
@@ -862,6 +941,7 @@ function SEED(){
   rec({일시:dayOff(-2)+' 14:00',현장ID:'S1',유형:'현장 점검',내용:'방수 ✓ 바닥 구배 ✓ 전기 배선 ✓ · 보류: 콘센트 위치'});
   rec({일시:dayOff(-3)+' 18:10',현장ID:'S1',유형:'공정 끝',내용:'목공(천장·벽체·몰딩) 완료',공정:'목공(천장·벽체·몰딩)'});
   D.todos=[{ID:'d1',현장ID:'S1',현장:'김○○',일자:today,할일:'욕실 타일 자재 확인',완료:''},{ID:'d2',현장ID:'S2',현장:'이○○',일자:today,할일:'은행 입금 확인',완료:''},{ID:'d3',현장ID:'S2',현장:'이○○',일자:dayOff(1),할일:'철거 폐기물 업체 예약',완료:''}];
+  D.biz=[['부가세 신고·납부','매년','1,4,7,10',25],['법인세 신고·납부','매년','3',31],['법인 지방소득세 신고·납부','매년','4',30],['법인세 중간예납','매년','8',31],['원천세 신고·납부','매월','',10],['4대보험 납부','매월','',10]].map((b,i)=>({ID:'B'+(i+1),제목:b[0],반복:b[1],월:b[2],일:b[3],날짜:'',시작:today,메모:'',완료:''}));
   D.records.sort((x,y)=>x.일시<y.일시?1:-1);return D;
 }
 
