@@ -46,7 +46,8 @@ h2{font-size:.85rem;color:var(--mute);font-weight:700;margin:.9rem 1rem .4rem}
 .vch{display:inline-flex;align-items:center;background:var(--plum);color:#fff;border-radius:.6rem;padding:.45rem .75rem;font-size:.9rem;font-weight:700;text-decoration:none}.vch.w{background:#E08A2E}.vidbar{flex:none;display:none;background:#E08A2E;color:#fff;padding:.5rem 1rem;font-weight:800;font-size:.95rem}.pics .ph{flex-direction:column}.pics .ph small{font-size:.7rem;display:block}
 .todo{display:flex;align-items:center;gap:.4rem;border-bottom:1px solid var(--line)}.todo:last-child{border:0}.todo .cb{padding:.7rem .6rem .7rem 0}.todo .cb i{display:block;width:1.8rem;height:1.8rem;border-radius:.5rem;border:3px solid #bbb;text-align:center;font-style:normal;line-height:1.3rem;color:#fff;font-weight:900}.todo.ok .cb i{background:var(--green);border-color:var(--green)}.todo.ok .cb i::after{content:"✓"}.todo .x{flex:1;min-width:0;padding:.55rem 0}.todo .x b{display:block;font-size:1rem}.todo.ok .x b{text-decoration:line-through;color:var(--mute)}.warn2{margin:.7rem .75rem .4rem;background:#FFF3D1;color:#7a4f00;border-radius:.8rem;padding:.6rem .8rem;font-weight:800}.todo small .r{color:var(--red);font-weight:800}.todo small{color:var(--mute);font-size:.85rem}.todo small u{display:inline-block;width:.6rem;height:.6rem;border-radius:.15rem;margin-right:.3rem}
 .qk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;padding:0 .75rem .4rem}.qk div{background:#fff;border-radius:1rem;text-align:center;padding:.8rem .2rem;font-weight:800;font-size:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06)}.qk em{display:block;font-style:normal;font-size:1.8rem;margin-bottom:.1rem}.qk div:last-child:nth-child(3n+1){grid-column:1/-1}
-.backrow{font-size:1rem;font-weight:700;opacity:.85;margin-bottom:.35rem}
+.bk{display:inline-flex;align-items:center;background:#fff;color:var(--plum);border:0;border-radius:.7rem;padding:.5rem .85rem;font-weight:800;font-size:1rem;margin-bottom:.5rem;box-shadow:0 1px 2px rgba(0,0,0,.15)}header .bk,.rhead .bk{background:#fff;color:var(--plum)}.sheet .bk{background:var(--bg);box-shadow:none;margin:0 0 .4rem}
+.qk div.add{background:var(--plum);color:#fff}.kv b.fit{display:block}
 .empty{color:var(--mute);text-align:center;padding:2rem 1rem;font-size:1rem;line-height:1.6}
 .sum{display:flex;gap:.5rem;margin:0 .75rem .7rem}.sum div{flex:1;background:#fff;border-radius:.9rem;padding:.55rem .3rem;text-align:center}.sum b{display:block;font-size:1.5rem}.sum span{font-size:.75rem;color:var(--mute)}.sum .r b{color:var(--red)}
 /* 주간 */
@@ -78,7 +79,7 @@ h2{font-size:.85rem;color:var(--mute);font-weight:700;margin:.9rem 1rem .4rem}
 .rec{padding:.55rem 0;border-bottom:1px solid var(--line)}.rec:last-child{border:0}.rec .h{font-size:.8rem;color:var(--mute)}.rec .b{font-size:1rem;margin-top:.15rem;white-space:pre-wrap;word-break:break-word}.rec .b b{color:var(--rose)}
 .rec .dt{font-size:.9rem;color:#444;background:var(--bg);border-radius:.6rem;padding:.5rem .6rem;margin-top:.4rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}.rec .dt.kakao{background:#FFF7D6;border-left:3px solid #F2C94C}
 .pics{display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap}.pics img,.pics .ph{width:4.2rem;height:4.2rem;border-radius:.6rem;object-fit:cover;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
-.pbtn{display:flex;gap:.5rem;margin-top:.6rem}.pbtn div{flex:1;background:#fff;border:2px dashed #bbb;border-radius:.9rem;padding:.7rem;text-align:center;font-size:.95rem;font-weight:700}.pbtn div em{display:block;font-style:normal;font-size:1.6rem;margin-bottom:.1rem}
+.pbtn{display:flex;gap:.4rem;margin-top:.5rem}.pbtn div{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:.7rem;padding:.55rem .2rem;text-align:center;font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden}.pbtn div em{font-style:normal;font-size:1.05rem;margin-right:.15rem}.pnote{font-size:.78rem;color:var(--mute);margin-top:.3rem}
 /* 공정 목록 */
 .pl .row{padding:.65rem 0;border-bottom:1px solid var(--line);font-size:1rem}.pl .row:last-child{border:0}
 .dot{width:.6rem;height:.6rem;border-radius:50%;display:inline-block;margin-right:.5rem;background:#ccc;flex:none}.dot.g{background:var(--green)}.dot.r{background:var(--rose)}.dot.x{background:var(--red)}
@@ -140,7 +141,8 @@ const workdays=(a,b)=>{let n=0;for(let d=new Date(a);d<=b;d.setDate(d.getDate()+
 const won=n=>n?Number(n).toLocaleString():'0';
 const man=n=>{n=+n||0;if(n>=100000000){const e=Math.floor(n/100000000),m=Math.round((n%100000000)/10000);return e+'억'+(m?' '+m.toLocaleString()+'만':'');}return n>=10000?Math.round(n/10000).toLocaleString()+'만':won(n);};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
-const TYPES=[['공정 끝','✅'],['공정 시작','▶️'],['투입','👷'],['현장 점검','🔍'],['특이사항','⚠️'],['고객 대화','💬'],['제품 선택','🧱']];
+const TYPES=[['공정 끝','✅'],['공정 시작','▶️'],['현장 점검','🔍'],['특이사항','⚠️'],['고객 대화','💬'],['제품 선택','🧱']];
+const MEDIA={'현장 점검':{cam:1,alb:1,vcam:1,valb:1},'제품 선택':{cam:1,alb:1,vcam:1,valb:1},'특이사항':{cam:1,alb:1},'고객 대화':{alb:1}}; // 종류별 사진·영상 버튼 (없으면 안 보임)
 const ACTIVE=['계약','시공중','AS'];
 
 // ============ 저장 원칙: 기록 먼저, 저장은 뒤에서 ============
@@ -152,15 +154,21 @@ const CFG=(()=>{let a='',k='';try{const q=new URLSearchParams(location.search);a
 const GAS=!!(CFG.api&&CFG.key);
 const LOCALHOST=/^(localhost|127\.0\.0\.1|)$/.test(location.hostname);
 const IDB={db:null,
-  open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);setTimeout(()=>rej(new Error('기기 저장소가 응답하지 않습니다')),5000);const q=indexedDB.open('choegojib_os',2);q.onupgradeneeded=()=>{const d=q.result;if(!d.objectStoreNames.contains('outbox'))d.createObjectStore('outbox',{keyPath:'id',autoIncrement:true});if(!d.objectStoreNames.contains('kv'))d.createObjectStore('kv');if(!d.objectStoreNames.contains('vid'))d.createObjectStore('vid',{keyPath:'key'});};q.onsuccess=()=>{this.db=q.result;this.db.onversionchange=()=>{this.db.close();this.db=null;};res(this.db)};q.onerror=()=>rej(q.error);})},
+  open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);const tm=setTimeout(()=>rej(new Error('기기 저장소가 응답하지 않습니다')),5000);
+    const q=indexedDB.open('choegojib_os'); // 버전을 정하지 않음: 다른 창에 옛 앱이 열려 있어도 막히지 않음
+    q.onupgradeneeded=()=>{const d=q.result;if(!d.objectStoreNames.contains('outbox'))d.createObjectStore('outbox',{keyPath:'id',autoIncrement:true});if(!d.objectStoreNames.contains('kv'))d.createObjectStore('kv');};
+    q.onsuccess=()=>{clearTimeout(tm);const d=q.result;if(!d.objectStoreNames.contains('kv')||!d.objectStoreNames.contains('outbox')){d.close();return rej(new Error('기기 저장소 준비 안 됨'));}this.db=d;d.onversionchange=()=>{d.close();this.db=null;};res(d)};
+    q.onerror=()=>{clearTimeout(tm);rej(q.error||new Error('기기 저장소 열기 실패'))};q.onblocked=()=>{clearTimeout(tm);rej(new Error('다른 창에 앱이 열려 있어요. 다른 창을 닫아주세요'))};})},
   tx(store,mode,fn){return this.open().then(db=>new Promise((res,rej)=>{const t=db.transaction(store,mode),r=fn(t.objectStore(store));t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error);}))},
   add(v){return this.tx('outbox','readwrite',st=>st.add(v))},
   all(){return this.tx('outbox','readonly',st=>st.getAll())},
   del(id){return this.tx('outbox','readwrite',st=>st.delete(id))},
   async delWhere(pred){const ops=await this.all();for(const o of ops)if(pred(o))await this.del(o.id);},
-  vall(){return this.tx('vid','readonly',st=>st.getAll())},
-  vput(j){return this.tx('vid','readwrite',st=>st.put(j))},
-  vdel(k){return this.tx('vid','readwrite',st=>st.delete(k))},
+  async vall(){const db=await this.open();const a=await this.tx('kv','readonly',st=>st.getAll(IDBKeyRange.bound('vid:','vid:\uffff')));
+    if(db.objectStoreNames.contains('vid')){const old=await this.tx('vid','readonly',st=>st.getAll());for(const j of old){await this.vput(j);await this.tx('vid','readwrite',st=>st.delete(j.key));a.push(j);}} // 이전 버전이 남긴 작업 옮김
+    return a;},
+  vput(j){return this.tx('kv','readwrite',st=>st.put(j,'vid:'+j.key))},
+  vdel(k){return this.tx('kv','readwrite',st=>st.delete('vid:'+k))},
   get(k){return this.tx('kv','readonly',st=>st.get(k))},
   set(k,v){return this.tx('kv','readwrite',st=>st.put(v,k))}
 };
@@ -199,6 +207,14 @@ const now=()=>{const d=new Date();return ds(d)+' '+String(d.getHours()).padStart
 const newId=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 
 let D=null,pending=0,syncErr='',syncing=false;
+const MEMQ=[];let memSeq=0; // 기기 저장소가 안 될 때 임시 보관 → 화면에 경고, 되는 대로 기기로 옮김
+const Q={
+  async add(op){try{await IDB.add(op);}catch(e){op.id='m'+(++memSeq);MEMQ.push(op);}},
+  async all(){let a=[];try{a=await IDB.all();}catch(e){}return a.concat(MEMQ);},
+  async del(id){if(typeof id==='string'&&id[0]==='m'){const i=MEMQ.findIndex(o=>o.id===id);if(i>=0)MEMQ.splice(i,1);}else await IDB.del(id);},
+  async delWhere(p){for(const o of await this.all())if(p(o))await this.del(o.id);},
+  async migrate(){for(const o of MEMQ.slice()){try{await IDB.add({fn:o.fn,args:o.args,t:o.t});MEMQ.splice(MEMQ.indexOf(o),1);}catch(e){break;}}}
+};
 const S={view:'today',calMode:'week',wk:'',ym:'',day:'',site:null,tab:'기록',filter:'전체'};
 
 async function api(fn,...args){
@@ -211,20 +227,20 @@ async function api(fn,...args){
   const out=LOCAL[fn](...args);                  // ① 즉시 반영
   D.records.sort((x,y)=>x.일시<y.일시?1:-1);
   saveCache();
-  if(GAS){try{await IDB.add({fn,args:qargs,t:Date.now()});}catch(e){toast('기기 저장 실패: '+(e.message||e));}pending++;badge();sync();} // ② → ③
+  if(GAS){await Q.add({fn,args:qargs,t:Date.now()});pending++;badge();sync();} // ② → ③
   return out;
 }
 function saveCache(){try{IDB.set('D',JSON.stringify(D));}catch(e){}}
 async function sync(){
   if(!GAS||syncing)return;syncing=true;
-  try{const ops=await IDB.all();pending=ops.length;badge();
-    for(const op of ops){await gas(op.fn,...op.args);await IDB.del(op.id);pending--;badge();}
+  try{await Q.migrate();const ops=await Q.all();pending=ops.length;badge();
+    for(const op of ops){await gas(op.fn,...op.args);await Q.del(op.id);pending--;badge();}
     syncErr='';if(ops.length){syncing=false;await refresh();}
   }catch(e){syncErr=e.message||String(e);if(!e.auth)setTimeout(sync,15000);}
   finally{syncing=false;badge();}
 }
 async function refresh(){ // 대기열이 비었을 때만 서버 데이터로 교체
-  if(!GAS||syncing)return;const ops=await IDB.all();if(ops.length)return;
+  if(!GAS||syncing)return;const ops=await Q.all();if(ops.length)return;
   const r=await gas('getData');D=JSON.parse(r);D.records.sort((x,y)=>x.일시<y.일시?1:-1);saveCache();render();
 }
 // 서버가 돌려준 오류를 대표님이 이해할 말로
@@ -238,17 +254,20 @@ function badge(){const el=$('#sync');if(!el)return;if(!GAS){el.style.display='no
   if(syncErr){el.className='sync err';el.textContent=syncErr.indexOf('접속 키')>=0?syncErr:'저장 대기 '+pending+'건 · '+friendly(syncErr);}
   else if(pending>0){el.className='sync wait';el.textContent='저장 중 '+pending;}
   else{el.className='sync ok';el.textContent='모두 저장됨';badge.t=setTimeout(()=>{if(!pending&&!syncErr)el.style.display='none';},2000);}
+  if(MEMQ.length){el.className='sync err';el.textContent+=' · 기기에 못 담은 '+MEMQ.length+'건: 저장될 때까지 앱을 닫지 마세요';}
 }
 function hideLoading(){$('#loading').style.display='none';}
 async function load(){
+  {const st=history.state;if(st&&st.view){S.view=st.view;S.site=st.site;S.tab=st.tab||'기록';S.calMode=st.calMode||'week';}navReplace(null);} // 새로고침해도 보던 화면
   let cached=null;try{cached=await IDB.get('D');}catch(e){}
   if(cached){D=JSON.parse(cached);D.today=ds(new Date());if(!S.ym){S.ym=D.today.slice(0,7);S.day=D.today;}render();hideLoading();} // 캐시로 즉시
   if(GAS&&!EXEC_RE.test(CFG.api)){showSetup('저장된 서버 주소가 올바르지 않습니다'+(/\/dev$/.test(CFG.api)?' (/dev 는 시험용 주소라 폰에서 열리지 않습니다). 배포 화면의 웹 앱 URL(/exec)을 넣어주세요':'')+'.');return;}
   if(!GAS&&!LOCALHOST&&!D){showSetup();return;}
   if(!GAS){if(!D){D=SEED();if(!S.ym){S.ym=D.today.slice(0,7);S.day=D.today;}render();hideLoading();}return;}
-  try{const ops=await IDB.all().catch(()=>[]);pending=ops.length;badge();
+  try{const ops=await Q.all();pending=ops.length;badge();
     if(ops.length){sync();}
     else{const r=await gas('getData');D=JSON.parse(r);D.records.sort((x,y)=>x.일시<y.일시?1:-1);if(!S.ym){S.ym=D.today.slice(0,7);S.day=D.today;}saveCache();render();hideLoading();}
+    vidSync();
   }catch(e){if(!D)$('#loading').innerHTML='<div style="padding:24px;text-align:center"><b>불러오기 실패</b><br><br><span style="font-size:13px">'+esc(e.message||e)+'</span><br><br><button class="save" style="width:auto;padding:10px 20px" onclick="location.reload()">다시 시도</button><br><button class="ghost" onclick="diagnose()">연결 진단</button><pre id="diag" style="text-align:left;font-size:11px;white-space:pre-wrap;word-break:break-all;margin-top:8px"></pre></div>';else toast('서버 연결 안 됨 · 기록은 기기에 보관됨');}
 }
 window.addEventListener('online',sync);document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync();});setInterval(()=>{if(pending||syncErr)sync();},20000);
@@ -270,10 +289,12 @@ const LOCAL={
     if(siteById(s.현장ID)){Object.assign(siteById(s.현장ID),s);return s.현장ID;}
     D.procs.push(...D.base.procs.map(p=>({현장ID:s.현장ID,순번:+p.순번,공정:p.공정,담당팀:'',시작:'',끝:'',상태:'예정',메모:''})));D.sites.push(s);return s.현장ID;},
   updateSite(id,p){Object.assign(siteById(id)||{},p);},
+  deleteSite(id){D.sites=D.sites.filter(s=>s.현장ID!==id);D.procs=D.procs.filter(p=>p.현장ID!==id);D.records=D.records.filter(r=>r.현장ID!==id);D.todos=(D.todos||[]).filter(t=>t.현장ID!==id);},
   updateProc(id,seq,p){Object.assign(procAt(id,seq)||{},p);},
   shiftProc(id,seq,end,follow,start){const r=simShift(id,seq,end,follow,start);if(!r)return null;r.procs.forEach(p=>Object.assign(procAt(id,p.순번),p));siteById(id).준공예정=r.준공예정;return r;},
   saveSchedule(id,rows){rows.forEach(r=>{const p=procAt(id,r.순번);if(p)Object.assign(p,{시작:r.시작||'',끝:r.끝||'',상태:r.상태||'예정'});});const ends=rows.filter(r=>r.끝&&r.상태!=='제외').map(r=>r.끝).sort();siteById(id).준공예정=ends.pop()||'';},
-  addProc(id,name,after){const ps=procsOf(id);const seq=after?+after+1:ps.reduce((m,p)=>Math.max(m,+p.순번),0)+1;ps.filter(p=>+p.순번>=seq).forEach(p=>p.순번=+p.순번+1);D.procs.push({현장ID:id,순번:seq,공정:name,담당팀:'',시작:'',끝:'',상태:'예정',메모:''});return seq;},
+  addProc(id,name,after,x){const ps=procsOf(id);x=x||{};const dup=ps.find(p=>p.공정===name&&(p.담당팀||'')===(x.담당팀||'')&&(p.시작||'')===(x.시작||'')&&(p.끝||'')===(x.시작?(x.끝||x.시작):''));if(dup)return dup.순번;const seq=after?+after+1:ps.reduce((m,p)=>Math.max(m,+p.순번),0)+1;ps.filter(p=>+p.순번>=seq).forEach(p=>p.순번=+p.순번+1);x=x||{};const row={현장ID:id,순번:seq,공정:name,담당팀:x.담당팀||'',시작:x.시작||'',끝:x.시작?(x.끝||x.시작):'',상태:'예정',메모:''};D.procs.push(row);
+    const s=siteById(id);if(row.끝&&s&&(!s.준공예정||s.준공예정<row.끝))s.준공예정=row.끝;return seq;},
   deleteProc(id,seq){D.procs=D.procs.filter(p=>!(p.현장ID===id&&+p.순번===+seq));},
   addRecord(r,photos){if(D.records.find(x=>x.ID===r.ID))return r.ID;
     if(photos&&photos.length)r.사진=photos.map(p=>'data:image/jpeg;base64,'+p.b64).concat(r.사진?String(r.사진).split('|'):[]).join('|');
@@ -307,10 +328,10 @@ const monday=d=>{const x=pd(d);x.setDate(x.getDate()-(x.getDay()+6)%7);return ds
 
 function siteBrief(s){ // 현장 하나의 오늘 상황을 문장으로
   const id=s.현장ID,ps=liveOf(id),total=ps.length,done=ps.filter(p=>p.상태==='완료').length;
-  const cur=ps.find(p=>dated(p)&&p.시작<=D.today&&D.today<=p.끝&&p.상태!=='완료');
+  const curs=ps.filter(p=>dated(p)&&p.시작<=D.today&&D.today<=p.끝&&p.상태!=='완료'),cur=curs[0];
   const warn=ps.filter(late).map(p=>`⚠ ${esc(short(p.공정))}${josa(short(p.공정),'이','가')} 예정보다 ${Math.max(1,workdays(pd(p.끝),pd(D.today))-1)}일 늦었습니다`);
   let main;
-  if(cur){const i=workdays(pd(cur.시작),pd(D.today)),n=workdays(pd(cur.시작),pd(cur.끝));main=`오늘 <b>${esc(short(cur.공정))}</b>${n>1?(i>=n?' 마지막 날':` ${i}일째 / ${n}일`):''}${cur.담당팀?' · '+esc(teamName(cur.담당팀)):''}`;}
+  if(cur)main='오늘 '+curs.map(c=>{const i=workdays(pd(c.시작),pd(D.today)),n=workdays(pd(c.시작),pd(c.끝));return `<b>${esc(short(c.공정))}</b>${n>1?(i>=n?' 마지막 날':` ${i}일째 / ${n}일`):''}${c.담당팀?' · '+esc(teamName(c.담당팀)):''}`;}).join('<br>');
   else if(!ps.some(p=>p.시작))main=total?'일정 미정 · 공정표에서 일정을 잡아주세요':'공정 없음';
   else if(total&&done===total)main='모든 공정 끝';
   else main='오늘 공정 없음';
@@ -319,7 +340,7 @@ function siteBrief(s){ // 현장 하나의 오늘 상황을 문장으로
   const ev=[];
   if(s.착공일&&s.착공일>=D.today&&daysBetween(D.today,s.착공일)<=7)ev.push(`${md(s.착공일)} 📷 비포 촬영 · 착공`);
   if(s.준공예정&&s.준공예정>=D.today&&daysBetween(D.today,s.준공예정)<=7)ev.push(`${md(s.준공예정)} 📷 애프터 촬영 · 준공`);
-  return {main,next,warn,ev,cur,done,total,pct:total?Math.round(done/total*100):0};
+  return {main,next,warn,ev,cur,curs,done,total,pct:total?Math.round(done/total*100):0};
 }
 function siteCard(s,b,withStatus){
   return `<div class="scard" style="border-left-color:${s.색}" onclick="go('site','${s.현장ID}')"><div class="row"><div class="n">${esc(s.고객명)} ${esc(s.평형||'')}</div>${withStatus?`<span class="tag ${s.상태==='시공중'?'':s.상태==='준공'?'green':'gray'}">${s.상태}</span>`:''}</div>
@@ -332,11 +353,30 @@ function render(){
   if(v==='site')nav.innerHTML=[['기록','📝','기록'],['공정','📋','공정표·정보']].map(([k,i,n])=>`<div class="${S.tab===k?'on':''}" onclick="S.tab='${k}';render();$('#main').scrollTop=0"><b>${i}</b>${n}</div>`).join('');
   ({today:renderHome,sites:renderHome,cal:renderCal,site:renderSite,teams:renderTeams})[v]();
   fitAll();
-  if(v==='cal')$('#hd').insertAdjacentHTML('afterbegin','<div class="backrow" onclick="go(\'today\')">‹ 내 현장</div>');
+  if(v==='cal')$('#hd').insertAdjacentHTML('afterbegin','<button class="bk" onclick="back()">‹ 뒤로</button>');
 }
 // 한 줄에 못 들어가면 글자를 줄여서 맞춤 (줄바꿈 없음)
 function fitAll(){document.querySelectorAll('.fit').forEach(el=>{el.style.fontSize='';let f=parseFloat(getComputedStyle(el).fontSize);while(el.scrollWidth>el.clientWidth+.5&&f>12){f-=.5;el.style.fontSize=f+'px';}});}
-function go(v,id){S.view=v;if(id)S.site=id;if(v==='site'){S.tab='기록';S.filter='전체';}render();$('#main').scrollTop=0;}
+// 화면마다 히스토리 한 칸: 폰 뒤로가기(스와이프·버튼)로 열린 창부터 닫히고, 홈까지 돌아감. 화면의 ‹ 뒤로 버튼도 같은 길
+const snap=(layer,d)=>({d,view:S.view,site:S.site,tab:S.tab,calMode:S.calMode,layer});
+const curD=()=>(history.state&&history.state.d)||0;
+function navPush(layer){try{history.pushState(snap(layer,curD()+1),'');}catch(e){}}
+function navReplace(layer){try{history.replaceState(snap(layer,curD()),'');}catch(e){}}
+let skipPop=0;
+function navBack(kind){const st=history.state;if(st&&st.layer&&st.layer.indexOf(kind)>=0){skipPop=1;setTimeout(()=>{skipPop=0;},800);history.back();}}
+window.addEventListener('popstate',e=>{
+  if(skipPop){skipPop=0;return;}
+  const st=e.state,layer=(st&&st.layer)||'';
+  if(layer.indexOf('rec')<0){const el=$('#rec');el.classList.remove('on');el.innerHTML='';}
+  if(layer.indexOf('sheet')<0){$('#sheet').classList.remove('on');$('#dim').classList.remove('on');}
+  if(!$('#rec').classList.contains('on')&&!$('#sheet').classList.contains('on'))PH.length=VID.length=0;
+  if(st&&st.view){S.view=st.view;S.site=st.site;S.tab=st.tab||'기록';S.calMode=st.calMode||'week';}else S.view='today';
+  if(S.view==='site'&&!siteById(S.site))S.view='today';
+  render();
+});
+function back(){if(curD()>0)history.back();else{S.view='today';render();}}
+function goHome(){const d=curD();S.view='today';render();if(d>0)history.go(-d);}
+function go(v,id){S.view=v;if(id)S.site=id;if(v==='site'){S.tab='기록';S.filter='전체';}navPush(null);render();$('#main').scrollTop=0;}
 
 const CH="data:image/webp;base64,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";
 const chImg=()=>`<img class="cz" alt="" src="${CH}">`;
@@ -371,8 +411,9 @@ function renderHome(){
   const t=D.today,ord=x=>({시공중:0,AS:1,계약:2}[x.상태]??9);
   const act=activeSites().sort((a,b)=>ord(a)-ord(b)),fin=D.sites.filter(x=>!act.includes(x));
   $('#hd').innerHTML=chImg()+`<div class="d">내 현장</div><div class="sub">${+t.slice(5,7)}월 ${+t.slice(8,10)}일 ${dow(t)}요일 · 진행 ${act.length}곳</div>`;
-  const tile=x=>{const b=siteBrief(x),c=b.cur;let lines;
-    if(c){const i=workdays(pd(c.시작),pd(D.today)),n=workdays(pd(c.시작),pd(c.끝));lines=['오늘 '+short(c.공정)+(n>1?(i>=n?' 마지막 날':' '+i+'일째'):''),((n>1?n+'일 ':'')+(c.담당팀?teamName(c.담당팀):'')).trim()].filter(Boolean);}
+  const tile=x=>{const b=siteBrief(x);let lines;const dur=c=>({i:workdays(pd(c.시작),pd(D.today)),n:workdays(pd(c.시작),pd(c.끝))});
+    if(b.curs.length===1){const c=b.curs[0],{i,n}=dur(c);lines=['오늘 '+short(c.공정)+(n>1?(i>=n?' 마지막 날':' '+i+'일째'):''),((n>1?n+'일 ':'')+(c.담당팀?teamName(c.담당팀):'')).trim()].filter(Boolean);}
+    else if(b.curs.length)lines=b.curs.map(c=>{const {i,n}=dur(c);return short(c.공정)+(n>1?' '+i+'/'+n+'일':'')+(c.담당팀?' · '+teamName(c.담당팀):'');});
     else lines=[b.main.replace(/<[^>]+>/g,'')];
     return `<div class="tile" style="background:${x.색}" onclick="go('site','${x.현장ID}')"><div><div class="n fit">${esc(x.고객명)}</div>${x.평형?`<div class="t fit">${esc(x.평형)}</div>`:''}${b.warn.length?`<span class="w">⚠ 늦은 공정 ${b.warn.length}</span>`:''}</div><div><big>${b.total?b.pct+'%':x.상태}</big>${lines.map(l=>`<div class="t fit">${esc(l)}</div>`).join("")}</div></div>`;};
   let h=`<div class="top2"><div onclick="go('cal')">📅 달력</div><div onclick="go('teams')">👷 시공팀</div></div><div class="tiles">${act.map(tile).join('')}<div class="tile add" onclick="openSiteForm()"><div style="font-size:2.4rem">＋</div><div>새 현장</div></div></div>`;
@@ -400,10 +441,10 @@ function renderWeek(tog){
     D.sites.forEach(s=>{
       if(s.착공일===d)ev.push(chip(s,'📷 비포 촬영 · 착공'));if(s.준공예정===d)ev.push(chip(s,'📷 애프터 촬영 · 준공'));if(s.계약일===d&&['상담','계약'].includes(s.상태))ev.push(chip(s,s.상태));
       if(w===0||w===6)return;
-      const p=liveOf(s.현장ID).find(p=>dated(p)&&p.시작<=d&&d<=p.끝);if(!p)return;
+      liveOf(s.현장ID).filter(p=>dated(p)&&p.시작<=d&&d<=p.끝).forEach(p=>{
       const n=workdays(pd(p.시작),pd(p.끝)),i=workdays(pd(p.시작),pd(d));
       let sm='';if(d===D.today&&late(p))sm=`<small class="r">${Math.max(1,workdays(pd(p.끝),pd(D.today))-1)}일 늦음</small>`;else if(n>1)sm=`<small>${i===1?'시작':i>=n?'마지막 날':i+'/'+n+'일'}</small>`;
-      ev.push(chip(s,esc(short(p.공정)),sm));});
+      ev.push(chip(s,esc(short(p.공정))+(p.담당팀?' · '+esc(teamName(p.담당팀)):''),sm));});});
     todosOn(d).forEach(t=>{const s=todoSite(t);ev.push(`<div class="chip" onclick="openTodo('${t.ID}')"><i style="background:${s?s.색:'#999'};border-radius:50%"></i>📝 ${esc(t.할일)}${t.완료?' ✓':''}</div>`);});
     return `<div class="wday ${w===0?'sun':w===6?'sat':''} ${d===D.today?'today':''}"><div class="dn"><b>${+d.slice(8)}</b><span>${dow(d)}${d===D.today?'·오늘':''}</span></div><div class="ev">${ev.join('')||`<div class="off">${w===0||w===6?'쉬는 날':'공정 없음'}</div>`}</div></div>`;}).join('');
   $('#main').innerHTML=nav+`<div class="wk">${rows}</div><div class="top2" style="grid-template-columns:1fr"><div onclick="openTodo()">＋ 할 일 추가</div></div>`;
@@ -421,9 +462,9 @@ function renderMonth(tog){
       const evs=[];if(s.착공일===ds_)evs.push('착공');if(s.준공예정===ds_)evs.push('준공');if(s.계약일===ds_&&['상담','계약'].includes(s.상태))evs.push(s.상태);
       evs.forEach(e=>bars+=`<div class="b ev" style="border-color:${s.색};color:${s.색}">${e}</div>`);
       if(w===0||w===6)return;
-      const p=liveOf(s.현장ID).find(p=>dated(p)&&p.시작<=ds_&&ds_<=p.끝);if(!p)return;
+      liveOf(s.현장ID).filter(p=>dated(p)&&p.시작<=ds_&&ds_<=p.끝).forEach(p=>{
       const pos=p.시작===p.끝?'':p.시작===ds_?'start':p.끝===ds_?'end':'cont';
-      bars+=`<div class="b ${pos} ${(p.시작===ds_||w===1)?'lbl':''}" style="background:${s.색}">${esc(short(p.공정))}</div>`;
+      bars+=`<div class="b ${pos} ${(p.시작===ds_||w===1)?'lbl':''}" style="background:${s.색}">${esc(short(p.공정))}</div>`;});
     });
     {const n=todosOn(ds_).length;if(n)bars+=`<div class="b ev" style="border-color:#888;color:#555">📝${n}</div>`;}
     g+=`<div class="day ${w===0?'sun off':w===6?'sat off':''} ${ds_===D.today?'today':''} ${ds_===S.day?'sel':''}" onclick="pickDay('${ds_}')"><div class="n">${d}</div>${bars}</div>`;
@@ -435,12 +476,12 @@ function pickDay(d){S.day=d;render();}
 function dayPanel(){
   const day=S.day;
   const rows=D.sites.map(s=>{
-    const p=liveOf(s.현장ID).find(p=>dated(p)&&p.시작<=day&&day<=p.끝);
+    const pp=liveOf(s.현장ID).filter(p=>dated(p)&&p.시작<=day&&day<=p.끝),p=pp[0];
     const evs=[];if(s.착공일===day)evs.push('착공 · 📷 비포 촬영');if(s.준공예정===day)evs.push('준공예정 · 📷 애프터 촬영');if(s.계약일===day)evs.push(s.상태==='상담'?'상담':'계약');
     if(!p&&!evs.length)return '';
     const recs=D.records.filter(r=>r.현장ID===s.현장ID&&r.일시.slice(0,10)===day);
-    return `<div class="site" onclick="go('site','${s.현장ID}')"><i style="background:${s.색}"></i><div style="flex:1"><div class="t">${esc(s.고객명)} · ${p?esc(short(p.공정)):evs[0]} ${p&&late(p)?'<span class="tag red">늦음</span>':''}</div>
-      <div class="s">${[p&&p.담당팀?esc(teamName(p.담당팀)):'',p?`${md(p.시작)}~${md(p.끝)}`:'',recs.length?`기록 ${recs.length}`:'',...(p?evs:[])].filter(Boolean).join(' · ')}</div></div></div>`;
+    return `<div class="site" onclick="go('site','${s.현장ID}')"><i style="background:${s.색}"></i><div style="flex:1"><div class="t">${esc(s.고객명)} · ${p?pp.map(x=>esc(short(x.공정))).join(' + '):evs[0]} ${p&&late(p)?'<span class="tag red">늦음</span>':''}</div>
+      <div class="s">${[pp.map(x=>x.담당팀?esc(teamName(x.담당팀)):'').filter(Boolean).join('·'),p?`${md(p.시작)}~${md(p.끝)}`:'',recs.length?`기록 ${recs.length}`:'',...(p?evs:[])].filter(Boolean).join(' · ')}</div></div></div>`;
   }).join('');
   const tl=todosOn(day).map(todoRow).join('');
   return `<h2>${+day.slice(8)}일 ${dow(day)}요일${day===D.today?' · 오늘':''}</h2><div class="card">${rows||(tl?'':'<div class="empty">이 날 공정 없음</div>')}${tl}</div><div class="top2" style="grid-template-columns:1fr"><div onclick="openTodo(null,'','${day}')">＋ ${+day.slice(8)}일 할 일 추가</div></div>`;
@@ -449,14 +490,14 @@ function dayPanel(){
 // ---- 현장 목록 ----
 // ---- 현장 상세 ----
 function renderSite(){
-  const s=siteById(S.site);if(!s)return go('sites');
+  const s=siteById(S.site);if(!s){S.view='today';return render();}
   const ps=liveOf(s.현장ID),b=siteBrief(s);
-  const labor=D.records.filter(r=>r.현장ID===s.현장ID&&r.유형==='투입').reduce((a,r)=>a+(+r.금액||0),0);
+  const tms=[...new Set(ps.map(p=>p.담당팀).filter(Boolean))].map(teamName);
   const conf=[];ps.filter(p=>dated(p)&&p.담당팀&&p.끝>=D.today&&p.상태!=='완료').forEach(p=>D.procs.filter(q=>q.현장ID!==s.현장ID&&q.담당팀===p.담당팀&&dated(q)&&q.상태!=='완료'&&q.시작<=p.끝&&p.시작<=q.끝).forEach(q=>conf.push(`${esc(teamName(p.담당팀))} ${md(p.시작>q.시작?p.시작:q.시작)} ${esc(siteById(q.현장ID)?.고객명||'')}과 겹침`)));
   const notes=[...b.warn.map(w=>w.replace('⚠ ','')),...new Set(conf)];
-  $('#hd').innerHTML=`<div class="row"><div><div class="d"><span onclick="go('sites')" style="opacity:.7">‹</span> ${esc(s.고객명)} ${esc(s.평형||'')}</div><div class="sub">${esc(s.주소||'')}${s.연락처?` · <a href="tel:${esc(s.연락처)}">📞 ${esc(s.연락처)}</a>`:''}</div></div><button onclick="openSiteForm('${s.현장ID}')">정보</button></div>`;
-  let h=(S.tab==='기록'?`<h2>무엇을 기록할까요?</h2><div class="qk">${TYPES.map(([t,i])=>`<div onclick="startRecord('${t}','${s.현장ID}')"><em>${i}</em>${t}</div>`).join('')}</div>`+siteTodoHtml(s):'')+`<div class="scard" style="border-left-color:${s.색}"><div class="n">${b.done} / ${b.total} 공정 끝 <span class="tag ${s.상태==='시공중'?'':'gray'}">${s.상태}</span></div><div class="bar"><i style="width:${b.pct}%"></i></div>
-    <div class="kv"><div><small>계약금액</small><b>${s.계약금액?man(+s.계약금액):'—'}</b></div><div><small>노무비 누계</small><b>${man(labor)}</b></div><div><small>준공예정</small><b>${s.준공예정?md(s.준공예정)+' ('+dow(s.준공예정)+')':'미정'}</b></div><div><small>📷 촬영</small><b style="font-size:.95rem">비포 ${s.착공일?md(s.착공일):'—'}<br>애프터 ${s.준공예정?md(s.준공예정):'—'}</b></div></div></div>
+  $('#hd').innerHTML=`<button class="bk" onclick="back()">‹ 뒤로</button><div class="row"><div><div class="d">${esc(s.고객명)} ${esc(s.평형||'')}</div><div class="sub">${esc(s.주소||'')}${s.연락처?` · <a href="tel:${esc(s.연락처)}">📞 ${esc(s.연락처)}</a>`:''}</div></div><button onclick="openSiteForm('${s.현장ID}')">정보</button></div>`;
+  let h=(S.tab==='기록'?`<h2>무엇을 기록할까요?</h2><div class="qk"><div class="add" onclick="openAddProc('${s.현장ID}')"><em>＋</em>공정 추가</div>${TYPES.map(([t,i])=>`<div onclick="startRecord('${t}','${s.현장ID}')"><em>${i}</em>${t}</div>`).join('')}</div>`+siteTodoHtml(s):'')+`<div class="scard" style="border-left-color:${s.색}"><div class="n">${b.done} / ${b.total} 공정 끝 <span class="tag ${s.상태==='시공중'?'':'gray'}">${s.상태}</span></div><div class="bar"><i style="width:${b.pct}%"></i></div>
+    <div class="kv"><div><small>계약금액</small><b>${s.계약금액?man(+s.계약금액):'—'}</b></div><div><small>👷 시공팀</small><b class="fit" style="font-size:.95rem">${tms.length?esc(tms.join(' · ')):'—'}</b></div><div><small>준공예정</small><b>${s.준공예정?md(s.준공예정)+' ('+dow(s.준공예정)+')':'미정'}</b></div><div><small>📷 촬영</small><b style="font-size:.95rem">비포 ${s.착공일?md(s.착공일):'—'}<br>애프터 ${s.준공예정?md(s.준공예정):'—'}</b></div></div></div>
     <div class="card lines"><div class="ln"><span class="k">오늘</span><span class="v">${b.main.replace(/^오늘 /,'')}</span></div>${b.next?`<div class="ln"><span class="k">다음</span><span class="v">${b.next}</span></div>`:''}${notes.map(n=>`<div class="ln r"><span class="k">주의</span><span class="v">${n}</span></div>`).join('')}</div>`;
   h+=S.tab==='기록'?timeline(s):procList(s);
   $('#main').innerHTML=h;
@@ -468,8 +509,8 @@ function timeline(s){
   if(!list.length)return `<div class="empty">${chImg()}기록이 없습니다.<br>아래 "＋ 이 현장에 기록"을 누르세요</div>`;
   const groups={};list.forEach(r=>{(groups[r.일시.slice(0,10)]=groups[r.일시.slice(0,10)]||[]).push(r)});
   return ``+Object.keys(groups).sort().reverse().map(d=>{
-    const p=liveOf(s.현장ID).find(p=>dated(p)&&p.시작<=d&&d<=p.끝);
-    return `<h2>${d===D.today?'오늘 · ':''}${md(d)} ${dow(d)}요일${p?' · '+esc(short(p.공정)):''}</h2><div class="card">${groups[d].map(r=>recHtml(r)).join('')}</div>`;}).join('');
+    const pn=liveOf(s.현장ID).filter(p=>dated(p)&&p.시작<=d&&d<=p.끝).map(p=>esc(short(p.공정))).join(' + ');
+    return `<h2>${d===D.today?'오늘 · ':''}${md(d)} ${dow(d)}요일${pn?' · '+pn:''}</h2><div class="card">${groups[d].map(r=>recHtml(r)).join('')}</div>`;}).join('');
 }
 function recHtml(r,withSite){
   const ico=Object.fromEntries(TYPES)[r.유형]||(r.유형==='할 일'?'☑️':'•');
@@ -523,18 +564,20 @@ function scStandard(){
   SC.rows.forEach(r=>{if(r.상태==='제외'||r.상태==='완료')return;const dur=D.base.procs.find(b=>b.공정===r.공정)?.기본소요일||1;const st=new Date(d),en=addWork(st,dur-1);r.시작=ds(st);r.끝=ds(en);d=nextWork(en);});
   drawSchedule();
 }
-function openAddProc(siteId){
-  const ps=procsOf(siteId);
-  openSheet(`<div class="t">공정 추가</div><label class="l">공정 이름 *</label><input class="in" id="ap_name" placeholder="예: 탄성코트, 줄눈, 방충망">
-    <label class="l">어디 뒤에</label><select class="in" id="ap_after">${opt(ps,ps.length?ps[ps.length-1].순번:'',p=>p.순번+' '+p.공정+' 뒤',p=>p.순번)}<option value="">맨 앞</option></select>
-    <label class="l">시작 · 끝 (선택, 나중에 일정 잡기에서도 됨)</label><div class="dates"><input type="date" class="in" id="ap_s"><input type="date" class="in" id="ap_e"></div>
+function openAddProc(siteId,v){ // v: 팀 추가 후 돌아올 때 입력값 복원
+  v=v||{};const ps=procsOf(siteId);
+  openSheet(`<div class="t">공정 추가</div><label class="l">공정 이름 *</label><input class="in" id="ap_name" list="ap_list" value="${esc(v.name||'')}" placeholder="예: 타일, 목공, 탄성코트"><datalist id="ap_list">${D.base.procs.map(p=>`<option value="${esc(p.공정)}">`).join('')}</datalist>
+    <label class="l">맡은 팀</label><select class="in" id="ap_team" onchange="if(this.value==='__new'){const v={name:val('ap_name'),after:val('ap_after'),s:val('ap_s'),e:val('ap_e')};R.after=id=>openAddProc('${siteId}',Object.assign(v,{team:id}));openTeamForm();}">${opt(D.teams,v.team||'',t=>t.팀명+(t.공종?' · '+t.공종:''),t=>t.팀ID,'— 아직 없음')}<option value="__new">＋ 새 팀 추가…</option></select>
+    <label class="l">시작 · 끝</label><div class="dates"><input type="date" class="in" id="ap_s" value="${v.s||''}"><input type="date" class="in" id="ap_e" value="${v.e||''}"></div>
+    <label class="l">순서 (어디 뒤에)</label><select class="in" id="ap_after">${opt(ps,v.after!==undefined?v.after:(ps.length?ps[ps.length-1].순번:''),p=>p.순번+' '+p.공정+' 뒤',p=>p.순번)}<option value="">맨 앞</option></select>
+    <div class="note">같은 기간에 여러 공정이 겹쳐도 됩니다. 팀·날짜는 나중에 공정표에서 바꿀 수 있어요.</div>
     <button class="save" onclick="saveAddProc('${siteId}')">추가</button>`);
 }
 async function saveAddProc(siteId){
   const name=val('ap_name');if(!name)return toast('공정 이름을 쓰세요');
-  const seq=await api('addProc',siteId,name,val('ap_after'));
-  if(val('ap_s'))await api('updateProc',siteId,seq,{시작:val('ap_s'),끝:val('ap_e')||val('ap_s')});
-  closeSheet();toast(name+' 추가됨');render();if(S.view==='site'){S.tab='공정';render();}
+  const team=val('ap_team')==='__new'?'':val('ap_team'),st=val('ap_s'),en=val('ap_e')||st;
+  await api('addProc',siteId,name,val('ap_after'),{담당팀:team,시작:st,끝:en});
+  closeSheet();toast(name+' 추가됨');render();
 }
 async function saveSchedule(){
   const rows=SC.rows.map(r=>({순번:r.순번,시작:r.시작,끝:r.끝||r.시작,상태:r.상태}));
@@ -543,22 +586,20 @@ async function saveSchedule(){
 
 // ---- 시공팀 ----
 function renderTeams(){
-  $('#hd').innerHTML=`<div class="row"><span class="d"><span onclick="go('sites')" style="opacity:.7">‹</span> 시공팀 · ${+S.ym.slice(5)}월</span><span><button onclick="moveMonth(-1)">‹</button> <button onclick="moveMonth(1)">›</button> <button onclick="openTeamForm()">＋ 팀</button></span></div>`;
-  const recs=D.records.filter(r=>r.유형==='투입'&&r.일시.slice(0,7)===S.ym);
-  const total=recs.reduce((a,r)=>a+(+r.금액||0),0), paid=recs.filter(r=>r.지급).reduce((a,r)=>a+(+r.금액||0),0);
-  let h=`<div class="card" style="background:var(--plum);color:#fff"><div class="row"><span>${+S.ym.slice(5)}월 노무비</span><b style="font-size:1.3rem">${man(total)}</b></div><div class="s" style="color:#fff;opacity:.8">지급 ${man(paid)} · 미지급 ${man(total-paid)}</div></div>`;
-  h+=D.teams.map(t=>{
-    const rs=recs.filter(r=>r.팀ID===t.팀ID), gs=rs.reduce((a,r)=>a+(+r.공수||0),0), amt=rs.reduce((a,r)=>a+(+r.금액||0),0), pd_=rs.filter(r=>r.지급).reduce((a,r)=>a+(+r.금액||0),0);
-    const sites=[...new Set(rs.map(r=>siteById(r.현장ID)?.고객명).filter(Boolean))].join('·');
-    return `<div class="card" onclick="openTeamForm('${t.팀ID}')"><div class="row"><div><div class="t">${esc(t.팀명)} <span class="s" style="display:inline">${esc(t.공종||'')}</span></div><div class="s">${[t.대표자?esc(t.대표자):'',t.연락처?`<a href="tel:${esc(t.연락처)}" onclick="event.stopPropagation()">📞 ${esc(t.연락처)}</a>`:'',sites?esc(sites):''].filter(Boolean).join(' · ')||'이달 기록 없음'}</div></div>${amt?`<span class="tag ${amt===pd_?'green':'red'}">${amt===pd_?'지급완료':'미지급 '+man(amt-pd_)}</span>`:''}</div>
-      ${rs.length?`<div class="kv" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div><small>공수</small><b>${gs}</b></div><div><small>금액</small><b>${man(amt)}</b></div><div><small>지급</small><b>${man(pd_)}</b></div></div>`:''}</div>`;
-  }).join('')||'<div class="empty">팀을 추가하세요.<br>투입 기록에 팀이 필요합니다</div>';
+  $('#hd').innerHTML=`<button class="bk" onclick="back()">‹ 뒤로</button><div class="row"><span class="d">시공팀</span><button onclick="openTeamForm()">＋ 팀</button></div>`;
+  const h=D.teams.map(t=>{
+    const ps=D.procs.filter(p=>p.담당팀===t.팀ID&&dated(p)&&p.상태!=='완료'&&p.끝>=D.today).sort((a,b)=>a.시작<b.시작?-1:1);
+    return `<div class="card" onclick="openTeamForm('${t.팀ID}')"><div class="t">${esc(t.팀명)} <span class="s" style="display:inline">${esc(t.공종||'')}</span></div><div class="s">${[t.대표자?esc(t.대표자):'',t.연락처?`<a href="tel:${esc(t.연락처)}" onclick="event.stopPropagation()">📞 ${esc(t.연락처)}</a>`:''].filter(Boolean).join(' · ')}</div>
+      ${ps.length?`<div class="pl" style="margin-top:.4rem">${ps.map(p=>`<div class="row"><span style="display:flex;align-items:center;min-width:0"><i class="dot" style="background:${siteById(p.현장ID)?.색||'#ccc'}"></i><span class="fit">${esc(siteById(p.현장ID)?.고객명||'')} · ${esc(short(p.공정))}</span></span><span class="s" style="white-space:nowrap">${md(p.시작)}${p.시작!==p.끝?'~'+md(p.끝):''}</span></div>`).join('')}</div>`:'<div class="s" style="margin-top:.3rem">잡힌 공정 없음</div>'}</div>`;
+  }).join('')||`<div class="empty">${chImg()}팀을 추가하세요.<br>공정을 추가할 때 맡은 팀을 고를 수 있습니다</div>`;
   $('#main').innerHTML=h;
 }
 
 // ============ 시트(편집 창) ============
-function openSheet(html){$('#sheet').innerHTML='<div class="h"></div>'+html;$('#sheet').classList.add('on');$('#dim').classList.add('on');}
-function closeSheet(){$('#sheet').classList.remove('on');$('#dim').classList.remove('on');if(!$('#rec').classList.contains('on'))PH.length=VID.length=0;}
+function openSheet(html){const sh=$('#sheet'),was=sh.classList.contains('on');sh.innerHTML='<div class="h"></div><button class="bk" onclick="closeSheet()">‹ 뒤로</button>'+html;sh.classList.add('on');$('#dim').classList.add('on');sh.scrollTop=0;
+  const layer=$('#rec').classList.contains('on')?'rec+sheet':'sheet';if(was)navReplace(layer);else navPush(layer);}
+function closeSheetKeep(){$('#sheet').classList.remove('on');$('#dim').classList.remove('on');if(!$('#rec').classList.contains('on'))PH.length=VID.length=0;} // 화면만 닫음(히스토리는 호출한 쪽이 처리)
+function closeSheet(){if(!$('#sheet').classList.contains('on'))return;closeSheetKeep();navBack('sheet');}
 $('#dim').onclick=closeSheet;
 const opt=(list,val,label=x=>x,value=x=>x,blank)=>(blank?`<option value="">${blank}</option>`:'')+list.map(x=>`<option value="${esc(value(x))}" ${value(x)==val?'selected':''}>${esc(label(x))}</option>`).join('');
 const val=id=>$('#'+id)?.value?.trim()||'';
@@ -567,7 +608,9 @@ const val=id=>$('#'+id)?.value?.trim()||'';
 const PH=[]; // {name,mime,b64(원본),thumb(화면용 640px)}
 const MAXMB=20;
 function picsHtml(){return PH.map(p=>p.thumb?`<img src="${p.thumb}">`:'<div class="ph">🖼</div>').join('');}
-function photoBtns(){return `<div class="pics" id="pics">${picsHtml()}</div><div class="pbtn"><div onclick="$('#cam').click()"><em>📷</em>사진 찍기</div><div onclick="$('#alb').click()"><em>🖼</em>앨범에서</div></div><div class="note">원본 화질 그대로 드라이브 <b>현장OS</b> 폴더에 저장됩니다. 편집용 컷은 앨범에서 고르면 가장 좋습니다</div><input type="file" id="cam" accept="image/*" capture="environment" hidden onchange="addPhotos(this.files)"><input type="file" id="alb" accept="image/*" multiple hidden onchange="addPhotos(this.files)">`+vidBtns();}
+function photoBtns(o){o=o||{cam:1,alb:1,vcam:1,valb:1};
+  return `<div class="pics" id="pics">${picsHtml()}</div><div class="pics" id="vids">${vidsHtml()}</div><div class="pbtn">${o.cam?`<div onclick="$('#cam').click()"><em>📷</em>찍기</div>`:''}${o.alb?`<div onclick="$('#alb').click()"><em>🖼</em>앨범</div>`:''}${o.vcam?`<div onclick="$('#vcam').click()"><em>🎬</em>영상</div>`:''}${o.valb?`<div onclick="$('#valb').click()"><em>🎞</em>영상앨범</div>`:''}</div><div class="pnote">원본 그대로 드라이브 현장OS 폴더에 저장${o.vcam||o.valb?' · 영상은 올리는 동안 앱을 열어 두세요':''}</div>
+  <input type="file" id="cam" accept="image/*" capture="environment" hidden onchange="addPhotos(this.files)"><input type="file" id="alb" accept="image/*" multiple hidden onchange="addPhotos(this.files)"><input type="file" id="vcam" accept="video/*" capture="environment" hidden onchange="addVideos(this.files)"><input type="file" id="valb" accept="video/*" multiple hidden onchange="addVideos(this.files)">`;}
 async function addPhotos(files){
   for(const f of files){
     if(f.size>MAXMB*1048576){toast(`${f.name}: ${MAXMB}MB가 넘어 뺐습니다`);continue;}
@@ -583,7 +626,6 @@ function resize(file,M){return new Promise((res,rej)=>{const img=new Image();img
 const VID=[],VMEM={},VJ={},MAXVID=2048,VCH=3*1048576; // MAXVID: MB
 const vidChips=r=>String(r.사진||'').split('|').filter(i=>i.startsWith('v:')).map(i=>`<a class="vch" href="https://drive.google.com/file/d/${i.slice(2)}/view" target="_blank" onclick="event.stopPropagation()">🎬 영상 보기</a>`).join('')+Object.keys(VJ).filter(k=>VJ[k].rid===r.ID).map(k=>`<span class="vch w" data-k="${k}">🎬 올리는 중 ${VJ[k].pct||0}%</span>`).join('');
 const vidsHtml=()=>VID.map(f=>`<div class="ph">🎬<small>${Math.round(f.size/1048576)}MB</small></div>`).join('');
-function vidBtns(){return `<div class="pics" id="vids">${vidsHtml()}</div><div class="pbtn"><div onclick="$('#vcam').click()"><em>🎬</em>영상 찍기</div><div onclick="$('#valb').click()"><em>🎞</em>영상 앨범</div></div><div class="note">원본 그대로 드라이브에 올라갑니다 (한 개 ${MAXVID/1024}GB까지). 올리는 동안 앱을 열어 두세요</div><input type="file" id="vcam" accept="video/*" capture="environment" hidden onchange="addVideos(this.files)"><input type="file" id="valb" accept="video/*" multiple hidden onchange="addVideos(this.files)">`;}
 function addVideos(files){
   for(const f of files){if(f.size>MAXVID*1048576){toast(`${f.name}: ${MAXVID/1024}GB가 넘어 뺐습니다`);continue;}VID.push(f);}
   const el=$('#vids');if(el)el.innerHTML=vidsHtml();
@@ -613,7 +655,7 @@ async function vidSync(){
       const idb=await IDB.vall().catch(()=>[]),jobs=[...idb,...Object.values(VMEM).filter(m=>!idb.some(x=>x.key===m.key))];
       jobs.forEach(j=>{if(!VJ[j.key])VJ[j.key]={rid:j.recordId,pct:Math.round(j.offset/j.size*100)};});vidBar();
       if(!jobs.length)break;
-      const ops=await IDB.all().catch(()=>[]),j=jobs.find(x=>!ops.some(o=>o.fn==='addRecord'&&o.args[0].ID===x.recordId)); // 기록이 서버에 올라간 뒤에만
+      const ops=await Q.all(),j=jobs.find(x=>!ops.some(o=>o.fn==='addRecord'&&o.args[0].ID===x.recordId)); // 기록이 서버에 올라간 뒤에만
       if(!j){await new Promise(r=>setTimeout(r,5000));continue;}
       try{await vidRun(j);}catch(e){if(e.auth)break;VJ[j.key]={...VJ[j.key],err:friendly(e.message)};vidBar();await new Promise(r=>setTimeout(r,15000));}
     }
@@ -644,18 +686,17 @@ function startRecord(type,site){
   PH.length=VID.length=0;R.site=site||(S.view==='site'?S.site:null);R.type=type||null;R.follow=true;R.gs=1;R.checks={};
   if(R.site&&!siteById(R.site))R.site=null;
   if(!R.site&&act.length===1)R.site=act[0].현장ID;
-  R.step=!R.site?1:(R.type?3:2);drawRec();
+  R.step=!R.site?1:(R.type?3:2);if(!$('#rec').classList.contains('on'))navPush('rec');drawRec();
 }
 function openRecord(type,site){startRecord(type,site);} // 팀 추가 후 복귀용
-function closeRec(){const el=$('#rec');el.classList.remove('on');el.innerHTML='';PH.length=VID.length=0;}
-function recHead(step,title){return `<div class="rhead"><div class="d">${title}</div><div class="sub">${step} / 3 단계${R.site&&step>1?' · '+esc(siteById(R.site)?.고객명||''):''}</div></div>`;}
+function closeRec(){const el=$('#rec');if(!el.classList.contains('on'))return;el.classList.remove('on');el.innerHTML='';PH.length=VID.length=0;navBack('rec');}
+function recHead(step,title){return `<div class="rhead"><button class="bk" onclick="closeRec()">‹ 뒤로</button><div class="d">${title}</div><div class="sub">${step} / 3 단계${R.site&&step>1?' · '+esc(siteById(R.site)?.고객명||''):''}</div></div>`;}
 function drawRec(){
   const el=$('#rec');el.classList.add('on');const act=activeSites();let h='';
   if(R.step===1)h=recHead(1,'기록하기')+`<div class="rbody"><div class="q">어느 현장인가요?</div>${act.map(x=>`<div class="opt ${x.현장ID===R.site?'on':''}" onclick="R.site='${x.현장ID}';R.step=2;drawRec()"><i style="background:${x.색}"></i>${esc(x.고객명)} ${esc(x.평형||'')}</div>`).join('')}</div><div class="rfoot"><div class="back" onclick="closeRec()">닫기</div></div>`;
   else if(R.step===2)h=recHead(2,'기록하기')+`<div class="rbody"><div class="q">무슨 기록인가요?</div><div class="grid2">${TYPES.map(([t,i])=>`<div class="opt ${R.type===t?'on':''}" onclick="R.type='${t}';R.step=3;drawRec()"><em>${i}</em>${t}</div>`).join('')}</div></div><div class="rfoot"><div class="back" onclick="${act.length>1?'R.step=1;drawRec()':'closeRec()'}">‹ ${act.length>1?'현장 다시 고르기':'닫기'}</div></div>`;
   else h=recHead(3,(Object.fromEntries(TYPES)[R.type]||'')+' '+R.type)+`<div class="rbody">${recFields()}</div><div class="rfoot"><button class="save" id="r_save" onclick="saveRecord()">저장</button><div class="back" onclick="R.step=2;drawRec()">‹ 종류 다시 고르기</div></div>`;
   el.innerHTML=h;const body=el.querySelector('.rbody');if(body)body.scrollTop=0;
-  if(R.step===3&&R.type==='투입')calcAmt();
 }
 function recFields(){
   const ps=liveOf(R.site), cp=curProc(R.site,D.today);let f='';
@@ -663,22 +704,16 @@ function recFields(){
   if(R.type==='공정 시작'){const def=ps.find(p=>p.상태==='진행')||ps.find(p=>p.상태!=='완료');f=`<label class="l">오늘 ${md(D.today)} 시작하는 공정</label><select class="in" id="r_proc" onchange="shiftPreview()">${opt(ps.filter(p=>p.상태!=='완료'),def?.순번,p=>p.순번+' '+p.공정,p=>p.순번)}</select>
     <label class="l">끝나는 날짜 (직접 선택)</label><input type="date" class="in" id="r_date" value="" min="${D.today}" onchange="shiftPreview()">
     <div class="tog ${R.follow?'on':''}" onclick="R.follow=!R.follow;this.classList.toggle('on');shiftPreview()"><span>뒤 공정 같이 밀기</span><i></i></div><div class="note" id="r_prev"></div>`;}
-  if(R.type==='투입')f=`<label class="l">팀</label><select class="in" id="r_team" onchange="if(this.value==='__new'){R.back=true;openTeamForm();return}">${opt(D.teams,cp?.담당팀||'',t=>t.팀명+(t.공종?' · '+t.공종:''),t=>t.팀ID)}<option value="__new">＋ 새 팀 추가…</option></select>
-    <label class="l">일당 (원)</label><input class="in" id="r_rate" inputmode="numeric" placeholder="예: 250000" oninput="calcAmt()">
-    <label class="l">공수 (인원 × 일)</label><div class="seg" id="r_gs">${[0.5,1,2,3].map(g=>`<span class="${R.gs===g?'on':''}" onclick="setGs(${g})">${g}</span>`).join('')}<input class="in" id="r_gs_in" inputmode="decimal" placeholder="직접" style="flex:1;padding:.6rem .3rem;text-align:center" oninput="setGs(+this.value,true)"></div>
-    <label class="l">금액 (일당 × 공수 자동, 고칠 수 있음)</label><input class="in" id="r_amt" inputmode="numeric"><label class="l">공정</label><select class="in" id="r_proc">${opt(ps,cp?.순번,p=>p.공정,p=>p.순번,'—')}</select>`;
   if(R.type==='현장 점검')f=`<label class="l">확인한 항목 (눌러서 ✓)</label><div class="chips" id="r_chk">${D.base.lists.점검항목.map(c=>`<span class="${R.checks[c]?'on':''}" onclick="R.checks['${c}']=!R.checks['${c}'];this.classList.toggle('on')">${c}</span>`).join('')}</div>`;
   if(R.type==='제품 선택')f=`<label class="l">품목</label><input class="in" id="r_item" placeholder="예: 욕실 타일, 주방 상판, 중문"><label class="l">고객이 고른 제품 · 색상</label><input class="in" id="r_prod" placeholder="예: LX 지인 베이지 300×600"><label class="l">관련 공정</label><select class="in" id="r_proc">${opt(ps,cp?.순번,p=>p.공정,p=>p.순번,'—')}</select>`;
-  const txtLabel={'공정 끝':'메모 (선택)','공정 시작':'메모 (선택)','투입':'메모 (선택)','현장 점검':'보류·문제 (선택)','특이사항':'무슨 일인가요?','고객 대화':'제목 한 줄','제품 선택':'메모 (선택)'}[R.type];
+  const txtLabel={'공정 끝':'메모 (선택)','공정 시작':'메모 (선택)','현장 점검':'보류·문제 (선택)','특이사항':'무슨 일인가요?','고객 대화':'제목 한 줄','제품 선택':'메모 (선택)'}[R.type];
   const mic=`<div class="note">키보드의 🎤 마이크를 누르고 말하면 글자로 들어갑니다</div>`;
   return f+`<label class="l">${txtLabel}</label>`+(R.type==='고객 대화'
     ?`<input class="in" id="r_text" placeholder="예: 욕실 타일 색상 확정"><label class="l">대화 내용 (카톡에서 복사해 붙여넣기)</label><textarea class="in" id="r_detail" placeholder="카톡 대화 복사 → 여기 붙여넣기. 캡처는 아래 사진으로"></textarea>${mic}`
     :`<textarea class="in" id="r_text" style="min-height:4rem" placeholder="${R.type==='특이사항'?'예: 욕실 타일 3박스 부족, 내일 추가 입고':''}"></textarea>${mic}`)
-    +photoBtns()
+    +(MEDIA[R.type]?photoBtns(MEDIA[R.type]):'')
     +(R.type!=='고객 대화'?`<div class="more" onclick="$('#r_detail').style.display='block';this.style.display='none'"><span>자세히 쓰기 (원인·조치·금액)</span><span>⌄</span></div><textarea class="in" id="r_detail" style="display:none;margin-top:.5rem"></textarea>`:'');
 }
-function setGs(g,typed){R.gs=g||0;$$('#r_gs span').forEach(e=>e.classList.toggle('on',!typed&&+e.textContent===g));if(!typed)$('#r_gs_in').value='';calcAmt();}
-function calcAmt(){const rate=+val('r_rate').replace(/\D/g,'');$('#r_amt').value=rate&&R.gs?Math.round(rate*R.gs):'';}
 function simShift(siteId,seq,newEnd,follow,newStart){ // 서버 shiftProc 과 같은 계산 (미리보기·목업용)
   const ps=procsOf(siteId).map(p=>({...p}));const t=ps.find(p=>+p.순번===+seq);if(!t)return null;
   if(!newEnd||!(newStart||t.시작))return null;let end=pd(newEnd),start=pd(newStart||t.시작);if(end<start)start=end;t.시작=ds(start);t.끝=ds(end);let cursor=end,moved=0;
@@ -695,7 +730,6 @@ async function saveRecord(){
   const ps=procsOf(R.site),pr=ps.find(p=>+p.순번===+val('r_proc'));
   if(R.type==='공정 끝'){if(!pr)return toast('공정을 고르세요');r.공정=pr.공정;r._seq=pr.순번;r.내용=r.내용||`${pr.공정} 완료`;}
   if(R.type==='공정 시작'){if(!pr||!val('r_date'))return toast('공정과 끝나는 날짜를 고르세요');r.공정=pr.공정;r._seq=pr.순번;r._newEnd=val('r_date');r._follow=R.follow;}
-  if(R.type==='투입'){if(!val('r_team')||val('r_team')==='__new')return toast('팀을 고르세요');if(!R.gs)return toast('공수를 넣으세요');r.팀ID=val('r_team');r.단가=+val('r_rate').replace(/\D/g,'')||'';r.공수=R.gs;r.금액=+val('r_amt').replace(/\D/g,'')||'';r.공정=pr?.공정||'';r.내용=r.내용||`${teamName(r.팀ID)} ${R.gs}공수`+(r.금액?' · '+won(r.금액)+'원':'');}
   if(R.type==='현장 점검'){const ok=Object.keys(R.checks).filter(k=>R.checks[k]);r.내용=(ok.length?ok.join(' ✓ ')+' ✓':'')+(r.내용?(ok.length?' · ':'')+'보류: '+r.내용:'');if(!r.내용)return toast('항목을 체크하세요');}
   if(R.type==='제품 선택'){if(!val('r_item')||!val('r_prod'))return toast('품목과 제품을 쓰세요');r.공정=pr?.공정||'';r.내용=`${val('r_item')}: ${val('r_prod')}`+(r.내용?' · '+r.내용:'');}
   if((R.type==='특이사항'||R.type==='고객 대화')&&!r.내용&&!r.상세&&!PH.length&&!VID.length)return toast('내용을 쓰거나 사진·영상을 넣으세요');
@@ -717,11 +751,11 @@ function showDone(id,snap,restore,nPhoto,nVid){
 }
 async function undoRecord(){
   clearInterval(doneT);$('#done').classList.remove('on');const c=doneCtx;doneCtx=null;if(!c)return;
-  try{await IDB.delWhere(op=>op.fn==='addPhoto'&&op.args[0]===c.id);}catch(e){}
+  await Q.delWhere(op=>op.fn==='addPhoto'&&op.args[0]===c.id);
   await vidCancel(c.id);
   await api('deleteRecord',c.id);
   if(c.restore&&c.snap)await api('saveSchedule',c.snap.site,c.snap.procs);
-  pending=(await IDB.all().catch(()=>[])).length;badge();toast('취소했습니다');render();
+  pending=(await Q.all()).length;badge();toast('취소했습니다');render();
 }
 
 // ---- 기록 수정 ----
@@ -730,7 +764,7 @@ function openRecordEdit(id){
   openSheet(`<div class="t">${esc(r.유형)} · ${r.일시}</div><label class="l">내용</label><input class="in" id="e_text" value="${esc(r.내용)}"><label class="l">상세</label><textarea class="in" id="e_detail">${esc(r.상세)}</textarea>
     ${r.유형==='투입'?`<label class="l">금액</label><input class="in" id="e_amt" inputmode="numeric" value="${r.금액}"><div class="tog ${r.지급?'on':''}" id="e_paid" onclick="this.classList.toggle('on')"><span>지급 완료</span><i></i></div>`:''}
     ${r.사진||Object.values(VJ).some(j=>j.rid===r.ID)?`<div class="pics">${String(r.사진||'').split('|').filter(i=>i&&!i.startsWith('v:')).map(i=>`<img src="${thumb(i)}" onclick="openPhoto('${i}')">`).join('')}${vidChips(r)}</div>`:''}
-    <label class="l">사진 추가</label>${photoBtns()}
+    <label class="l">사진·영상 추가</label>${photoBtns()}
     <button class="save" onclick="saveRecordEdit('${id}')">저장</button><button class="ghost danger" onclick="delRecord('${id}')">이 기록 삭제</button>`);
 }
 async function saveRecordEdit(id){
@@ -747,7 +781,7 @@ function openProc(siteId,seq){
   const p=procsOf(siteId).find(x=>+x.순번===+seq);R.follow=true;
   openSheet(`<div class="t">${p.순번} ${esc(p.공정)}</div><div class="s">${p.시작?md(p.시작)+' ~ '+md(p.끝):'날짜 없음'} · ${p.상태}${late(p)?' · <b style="color:var(--red)">지연</b>':''}</div>
     <label class="l">상태</label><div class="seg" id="p_st">${['예정','진행','완료','보류','제외'].map(s=>`<span class="${p.상태===s?'on':''}" onclick="$$('#p_st span').forEach(e=>e.classList.toggle('on',e===this))">${s}</span>`).join('')}</div>
-    <label class="l">담당팀</label><select class="in" id="p_team" onchange="if(this.value==='__new'){R.backProc={s:'${siteId}',q:${seq},st:$('#p_st .on')?.textContent,a:val('p_start'),b:val('p_end')};openTeamForm();}">${opt(D.teams,p.담당팀,t=>t.팀명+(t.공종?' · '+t.공종:''),t=>t.팀ID,'— 없음')}<option value="__new">＋ 새 팀 추가…</option></select>
+    <label class="l">담당팀</label><select class="in" id="p_team" onchange="if(this.value==='__new'){const st=$('#p_st .on')?.textContent,a=val('p_start'),b=val('p_end');R.after=id=>{openProc('${siteId}',${seq});$('#p_team').value=id;if(st)$$('#p_st span').forEach(e=>e.classList.toggle('on',e.textContent===st));$('#p_start').value=a;$('#p_end').value=b;};openTeamForm();}">${opt(D.teams,p.담당팀,t=>t.팀명+(t.공종?' · '+t.공종:''),t=>t.팀ID,'— 없음')}<option value="__new">＋ 새 팀 추가…</option></select>
     <label class="l">시작</label><input type="date" class="in" id="p_start" value="${p.시작}">
     <label class="l">끝</label><input type="date" class="in" id="p_end" value="${p.끝}" onchange="procPreview('${siteId}',${seq})">
     <div class="tog on" id="p_follow" onclick="R.follow=!R.follow;this.classList.toggle('on');procPreview('${siteId}',${seq})"><span>끝 날짜 바꾸면 뒤 공정 같이 밀기</span><i></i></div><div class="note" id="p_prev"></div>
@@ -774,12 +808,15 @@ function openSiteForm(id){
     <label class="l">계약일</label><input type="date" class="in" id="s_c" value="${s.계약일||''}">
     <label class="l">착공일 (비포 촬영일 · 표준 초안 기준일)</label><input type="date" class="in" id="s_start" value="${s.착공일||''}">
     <label class="l">메모</label><textarea class="in" id="s_memo">${esc(s.메모||'')}</textarea>
-    <button class="save" onclick="saveSite('${id||''}')">저장</button>`);
+    <button class="save" onclick="saveSite('${id||''}')">저장</button>${id?`<button class="ghost danger" onclick="delSite('${id}')">이 현장 삭제</button>`:''}`);
 }
+async function delSite(id){const s=siteById(id);if(!s)return;const n=D.records.filter(r=>r.현장ID===id).length;
+  if(!confirm(`"${s.고객명}" 현장을 지울까요?\n공정표와 기록 ${n}건, 할 일이 같이 지워집니다.\n드라이브의 사진·영상 파일은 남습니다.`))return;
+  closeSheetKeep();await api('deleteSite',id);toast('현장을 지웠습니다');goHome();}
 async function saveSite(id){
   const p={고객명:val('s_name'),평형:val('s_py'),주소:val('s_addr'),연락처:val('s_tel'),계약금액:+val('s_amt').replace(/\D/g,'')||'',상태:val('s_st'),계약일:val('s_c'),착공일:val('s_start'),메모:val('s_memo')};
   if(!p.고객명)return toast('고객명을 쓰세요');
-  if(id)await api('updateSite',id,p);else{const nid=await api('addSite',p);closeSheet();toast('현장 추가됨 · 일정을 잡으세요');render();S.site=nid;S.view='site';S.tab='공정';render();return;}
+  if(id)await api('updateSite',id,p);else{const nid=await api('addSite',p);closeSheetKeep();toast('현장 추가됨 · 공정을 추가하세요');S.site=nid;S.view='site';S.tab='기록';navReplace(null);render();return;}
   closeSheet();toast('저장됨');render();
 }
 
@@ -796,8 +833,9 @@ function openTeamForm(id){
 async function saveTeam(id){
   const p={팀명:val('t_name'),공종:val('t_kind'),대표자:val('t_rep'),연락처:val('t_tel'),계좌:val('t_acct')};
   if(!p.팀명)return toast('팀명을 쓰세요');
-  const nid=await api(id?'updateTeam':'addTeam',...(id?[id,p]:[p]));closeSheet();toast('저장됨');render();if(R.back){R.back=false;openRecord('투입',R.site);if(nid)$('#r_team').value=nid;}
-  else if(R.backProc){const b=R.backProc;R.backProc=null;openProc(b.s,b.q);if(nid)$('#p_team').value=nid;if(b.st)$$('#p_st span').forEach(e=>e.classList.toggle('on',e.textContent===b.st));if(b.a)$('#p_start').value=b.a;if(b.b)$('#p_end').value=b.b;}
+  const nid=await api(id?'updateTeam':'addTeam',...(id?[id,p]:[p]));toast('저장됨');
+  if(R.after){const f=R.after;R.after=null;f(nid);render();return;} // 공정 추가·수정 창으로 돌아감 (시트 교체)
+  closeSheet();render();
 }
 
 // ============ 로컬 목업 (GAS 밖에서 미리보기용) ============
@@ -818,13 +856,11 @@ function SEED(){
   procAt('S1',5).담당팀='T4';procAt('S1',6).담당팀='T1';procAt('S2',2).담당팀='T2';
   LOCAL.saveSchedule('S2',[{순번:1,시작:dayOff(-3),끝:dayOff(-3),상태:'완료'},{순번:2,시작:dayOff(-2),끝:dayOff(1),상태:'진행'}]);
   let rid=1;const rec=o=>D.records.push(Object.assign({ID:'r'+(rid++),상세:'',사진:'',팀ID:'',공수:'',금액:'',공정:'',지급:'',단가:''},o));
-  rec({일시:dayOff(-1)+' 09:10',현장ID:'S1',유형:'투입',내용:'타일팀 박반장 2공수',팀ID:'T1',공수:2,단가:250000,금액:500000,공정:'타일(욕실·현관·주방)'});
   rec({일시:dayOff(-1)+' 09:40',현장ID:'S1',유형:'특이사항',내용:'욕실 타일 3박스 부족, 내일 추가 입고',상세:'원인: 실측 때 현관 면적 누락\n조치: LX 추가 발주, 입고 내일 오전\n추가 비용: 자재 96,000원 (고객 안내 완료)'});
   rec({일시:dayOff(-2)+' 11:00',현장ID:'S1',유형:'제품 선택',내용:'욕실 타일: LX 지인 베이지 300×600',공정:'타일(욕실·현관·주방)'});
   rec({일시:dayOff(-2)+' 17:30',현장ID:'S1',유형:'고객 대화',내용:'욕실 타일 색상 최종 확정',상세:'[김○○] 그레이 말고 베이지로 바꿔도 될까요?\n[최고집] 네 가능합니다, 자재는 내일 아침 바꿔서 들어갑니다\n[김○○] 감사합니다 그걸로 해주세요'});
   rec({일시:dayOff(-2)+' 14:00',현장ID:'S1',유형:'현장 점검',내용:'방수 ✓ 바닥 구배 ✓ 전기 배선 ✓ · 보류: 콘센트 위치'});
   rec({일시:dayOff(-3)+' 18:10',현장ID:'S1',유형:'공정 끝',내용:'목공(천장·벽체·몰딩) 완료',공정:'목공(천장·벽체·몰딩)'});
-  rec({일시:dayOff(-2)+' 08:50',현장ID:'S2',유형:'투입',내용:'철거팀 최사장 1공수',팀ID:'T2',공수:1,단가:300000,금액:300000,공정:'철거',지급:'지급'});
   D.todos=[{ID:'d1',현장ID:'S1',현장:'김○○',일자:today,할일:'욕실 타일 자재 확인',완료:''},{ID:'d2',현장ID:'S2',현장:'이○○',일자:today,할일:'은행 입금 확인',완료:''},{ID:'d3',현장ID:'S2',현장:'이○○',일자:dayOff(1),할일:'철거 폐기물 업체 예약',완료:''}];
   D.records.sort((x,y)=>x.일시<y.일시?1:-1);return D;
 }
