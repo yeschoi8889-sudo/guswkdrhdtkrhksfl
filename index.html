@@ -48,7 +48,8 @@ h2{font-size:.85rem;color:var(--mute);font-weight:700;margin:.9rem 1rem .4rem}
 .qk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;padding:0 .75rem .4rem}.qk div{background:#fff;border-radius:1rem;text-align:center;padding:.8rem .2rem;font-weight:800;font-size:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06)}.qk em{display:block;font-style:normal;font-size:1.8rem;margin-bottom:.1rem}.qk div:last-child:nth-child(3n+1){grid-column:1/-1}
 .bk{display:inline-flex;align-items:center;background:#fff;color:var(--plum);border:0;border-radius:.7rem;padding:.5rem .85rem;font-weight:800;font-size:1rem;margin-bottom:.5rem;box-shadow:0 1px 2px rgba(0,0,0,.15)}header .bk,.rhead .bk{background:#fff;color:var(--plum)}.sheet .bk{background:var(--bg);box-shadow:none;margin:0 0 .4rem}
 .pbig{display:flex;gap:.5rem;margin-top:.7rem}.big{display:block;width:100%;border:0;border-radius:1rem;padding:.95rem .5rem;font-size:1.1rem;font-weight:800;margin-top:.6rem}.pbig .big{flex:1;margin-top:0}.big.go{background:var(--plum);color:#fff}.big.ok{background:var(--green);color:#fff}.big.undo{background:#ddd;color:#333}.big.ext{background:#fff;color:var(--rose);border:2px solid var(--rose)}.sub2{font-size:.9rem;color:var(--mute);margin:1.1rem 0 .1rem;font-weight:800;border-top:1px solid var(--line);padding-top:.8rem}
-.top2.t3{grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem}.top2.t3 div{padding:.75rem .3rem;font-size:.95rem}.bizal{margin:0 .75rem .7rem;background:#FFF3D1;border-radius:1rem;padding:.6rem .9rem;font-weight:700;color:#5a3d00}.bizal div{padding:.15rem 0}.bizal b{display:inline-block;min-width:3.4rem;color:#9a5b00}.bizal b.r,.todo small .r{color:var(--red)}.todo small .w{color:#b26a00;font-weight:800}
+.top2.t3{grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem}.top2.t3 div{padding:.75rem .3rem;font-size:.95rem}.b.bz{background:var(--plum);color:#fff}.b.bz.late{background:var(--red)}.b.bz.dn{background:#cfc6cc;text-decoration:line-through}.b.bz.more{background:transparent;color:var(--mute)}
+.bizal{margin:0 .75rem .7rem;background:#FFF3D1;border-radius:1rem;padding:.6rem .9rem;font-weight:700;color:#5a3d00}.bizal div{padding:.15rem 0}.bizal b{display:inline-block;min-width:3.4rem;color:#9a5b00}.bizal b.r,.todo small .r{color:var(--red)}.todo small .w{color:#b26a00;font-weight:800}
 .qk div.add{background:var(--plum);color:#fff}.kv b.fit{display:block}
 .empty{color:var(--mute);text-align:center;padding:2rem 1rem;font-size:1rem;line-height:1.6}
 .sum{display:flex;gap:.5rem;margin:0 .75rem .7rem}.sum div{flex:1;background:#fff;border-radius:.9rem;padding:.55rem .3rem;text-align:center}.sum b{display:block;font-size:1.5rem}.sum span{font-size:.75rem;color:var(--mute)}.sum .r b{color:var(--red)}
@@ -411,12 +412,25 @@ function bizAlert(){
 function renderBiz(){
   $('#hd').innerHTML=`<button class="bk" onclick="back()">‹ 뒤로</button><div class="row"><span class="d">사업 일정</span><button onclick="openBiz()">＋ 추가</button></div><div class="sub">현장과 별개로 챙길 회사 일 · 주말이면 다음 근무일</div>`;
   const rows=(D.biz||[]).map(b=>({b,o:bizNext(b)})),up=rows.filter(x=>x.o).sort((a,b)=>a.o.due-b.o.due);
+  // ---- 위: 월간 달력 (마감일 = 주말이면 다음 근무일) ----
+  S.bym=S.bym||D.today.slice(0,7);if(!S.bday)S.bday=D.today;
+  const [y,m]=S.bym.split('-').map(Number),m0=new Date(y,m-1,1),m1=new Date(y,m,0),from=new Date(y,m-1,-7),byDay={};
+  (D.biz||[]).forEach(b=>{const dn=bizDone(b),st=pd(b.시작||D.today);bizOccs(b,from<st?st:from,m1).forEach(o=>{if(o.due<m0||o.due>m1)return;const k=ds(o.due);(byDay[k]=byDay[k]||[]).push({b,o,done:dn.has(o.key)});});});
+  const shortT=t=>String(t).replace(/\s*(신고·납부|납부|신고)$/,'');
+  let g='';for(let i=0;i<m0.getDay();i++)g+='<div class="day blank"></div>';
+  for(let d=1;d<=m1.getDate();d++){const k=`${S.bym}-${String(d).padStart(2,'0')}`,w=(m0.getDay()+d-1)%7,l=byDay[k]||[];
+    g+=`<div class="day ${w===0?'sun off':w===6?'sat off':''} ${k===D.today?'today':''} ${k===S.bday?'sel':''}" onclick="S.bday='${k}';render()"><div class="n">${d}</div>${l.slice(0,2).map(x=>`<div class="b bz ${x.done?'dn':k<D.today?'late':''}">${esc(shortT(x.b.제목))}</div>`).join('')}${l.length>2?`<div class="b bz more">+${l.length-2}</div>`:''}</div>`;}
+  const sel=byDay[S.bday]||[];
+  const cal=`<div class="wnav"><span onclick="bizMonth2(-1)">‹ 지난달</span><b onclick="S.bym=D.today.slice(0,7);S.bday=D.today;render()">${y}년 ${m}월</b><span onclick="bizMonth2(1)">다음달 ›</span></div>
+    <div class="cal"><div class="wd">${[...'일월화수목금토'].map(c=>`<span>${c}</span>`).join('')}</div><div class="grid">${g}</div></div>
+    <h2>${+S.bday.slice(5,7)}월 ${+S.bday.slice(8)}일 ${dow(S.bday)}요일${S.bday===D.today?' · 오늘':''}</h2><div class="card">${sel.map(({b,o,done})=>`<div class="todo ${done?'ok':''}"><div class="cb" onclick="bizCheck('${b.ID}','${o.key}',${done?0:1})"><i></i></div><div class="x" onclick="openBiz('${b.ID}')"><b>${esc(b.제목)}</b><small>${repLabel(b)}${bkey(o.due)!==o.key?` · 원래 ${md(ds(o.base))} 주말`:''}</small></div></div>`).join('')||'<div class="empty" style="padding:.6rem">이 날 일정 없음</div>'}<div class="more" style="margin-top:.4rem" onclick="openBiz('',S.bday)"><span>＋ 이 날 일정 추가</span><span>›</span></div></div>
+    <h2>다가오는 일정</h2>`;
   const since=pd(D.today);since.setDate(since.getDate()-45);
   const until=pd(D.today);until.setDate(until.getDate()+400);
   const done=[];(D.biz||[]).forEach(b=>{const dn=bizDone(b);bizOccs(b,since,until).forEach(o=>{if(dn.has(o.key)&&o.due>=since)done.push({b,o});});}); // 45일 안에 끝낸 회차 (미리 끝낸 것 포함)
   let h=up.map(({b,o})=>{const n=daysBetween(D.today,ds(o.due)),moved=bkey(o.due)!==o.key;
     return `<div class="todo"><div class="cb" onclick="bizCheck('${b.ID}','${o.key}',1)"><i></i></div><div class="x" onclick="openBiz('${b.ID}')"><b>${esc(b.제목)}</b><small><span class="${n<0?'r':n<=3?'w':''}">${dLabel(o.due)}</span> · ${md(ds(o.due))} (${dow(ds(o.due))})${moved?` · 원래 ${md(ds(o.base))} 주말`:''} · ${repLabel(b)}</small></div></div>`;}).join('');
-  h=`<div class="card">${h||`<div class="empty">${chImg()}사업 일정이 없습니다.<br>위 ＋ 추가로 넣으세요</div>`}</div>`;
+  h=cal+`<div class="card">${h||`<div class="empty">${chImg()}사업 일정이 없습니다.<br>위 ＋ 추가로 넣으세요</div>`}</div>`;
   if(done.length)h+=`<h2>최근 끝낸 일</h2><div class="card">${done.sort((a,b)=>b.o.due-a.o.due).map(({b,o})=>`<div class="todo ok"><div class="cb" onclick="bizCheck('${b.ID}','${o.key}',0)"><i></i></div><div class="x"><b>${esc(b.제목)}</b><small>${md(ds(o.due))} · 눌러서 되돌리기</small></div></div>`).join('')}</div>`;
   h+=`<div class="note" style="margin:0 1rem">기본 목록은 12월 결산 법인 기준입니다. 세무사님께 확인 후 맞지 않는 건 눌러서 고치거나 지우세요. 공휴일은 반영하지 않습니다.</div>`;
   $('#main').innerHTML=h;
@@ -424,7 +438,8 @@ function renderBiz(){
 async function bizCheck(id,key,on){const b=(D.biz||[]).find(x=>x.ID===id);if(!b)return;const dn=bizDone(b);on?dn.add(key):dn.delete(key);
   await api('updateBiz',id,{완료:[...dn].sort().join(',')+(dn.size?',':'')});toast(on?'끝냈습니다 · 다음 회차가 잡혔어요':'되돌렸습니다');render();}
 const BZ={};
-function openBiz(id){const b=id?(D.biz||[]).find(x=>x.ID===id):null;Object.assign(BZ,b?{id,제목:b.제목,반복:b.반복,월:String(b.월||''),일:b.일,날짜:b.날짜,메모:b.메모}:{id:'',제목:'',반복:'매년',월:'',일:'',날짜:D.today,메모:''});drawBiz();}
+function openBiz(id,day){const b=id?(D.biz||[]).find(x=>x.ID===id):null;Object.assign(BZ,b?{id,제목:b.제목,반복:b.반복,월:String(b.월||''),일:b.일,날짜:b.날짜,메모:b.메모}:{id:'',제목:'',반복:day?'한번':'매년',월:day?String(+day.slice(5,7)):'',일:day?+day.slice(8):'',날짜:day||D.today,메모:''});drawBiz();}
+function bizMonth2(n){const [y,m]=S.bym.split('-').map(Number),d=new Date(y,m-1+n,1);S.bym=ds(d).slice(0,7);S.bday=S.bym+'-01';render();}
 function bizKeep(){['제목','일','날짜','메모'].forEach(k=>{const e=$('#bz_'+k);if(e)BZ[k]=e.value.trim();});}
 function drawBiz(){
   const ms=String(BZ.월).split(',').filter(Boolean);
