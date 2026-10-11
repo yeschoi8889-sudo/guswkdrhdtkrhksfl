@@ -50,6 +50,8 @@ h2{font-size:.85rem;color:var(--mute);font-weight:700;margin:.9rem 1rem .4rem}
 .pbig{display:flex;gap:.5rem;margin-top:.7rem}.big{display:block;width:100%;border:0;border-radius:1rem;padding:.95rem .5rem;font-size:1.1rem;font-weight:800;margin-top:.6rem}.pbig .big{flex:1;margin-top:0}.big.go{background:var(--plum);color:#fff}.big.ok{background:var(--green);color:#fff}.big.undo{background:#ddd;color:#333}.big.ext{background:#fff;color:var(--rose);border:2px solid var(--rose)}.sub2{font-size:.9rem;color:var(--mute);margin:1.1rem 0 .1rem;font-weight:800;border-top:1px solid var(--line);padding-top:.8rem}
 .top2.t3{grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem}.top2.t3 div{padding:.75rem .3rem;font-size:.95rem}.b.bz{background:var(--plum);color:#fff}.b.bz.late{background:var(--red)}.b.bz.dn{background:#cfc6cc;text-decoration:line-through}.b.bz.more{background:transparent;color:var(--mute)}
 .bizal{margin:0 .75rem .7rem;background:#FFF3D1;border-radius:1rem;padding:.6rem .9rem;font-weight:700;color:#5a3d00}.bizal div{padding:.15rem 0}.bizal b{display:inline-block;min-width:3.4rem;color:#9a5b00}.bizal b.r,.todo small .r{color:var(--red)}.todo small .w{color:#b26a00;font-weight:800}
+.pics .mt{position:relative;width:4.2rem;height:4.2rem;border-radius:.6rem;overflow:hidden;background:var(--plum);flex:none}.mt img{width:100%;height:100%;object-fit:cover;display:block;border-radius:0!important}.mt i{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-style:normal;font-size:1.3rem;text-shadow:0 1px 4px #000}.mt em{position:absolute;left:3px;bottom:3px;background:var(--rose);color:#fff;font-style:normal;font-size:.68rem;padding:0 .3rem;border-radius:.3rem;font-weight:800}
+.gal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.3rem;padding:0 .75rem}.gal .mt{position:relative;aspect-ratio:1/1;border-radius:.6rem;overflow:hidden;background:var(--plum)}.mview{width:100%;max-height:55vh;object-fit:contain;border-radius:.8rem;background:#111;display:block;margin-top:.5rem}
 .qk div.add{background:var(--plum);color:#fff}.kv b.fit{display:block}
 .empty{color:var(--mute);text-align:center;padding:2rem 1rem;font-size:1rem;line-height:1.6}
 .sum{display:flex;gap:.5rem;margin:0 .75rem .7rem}.sum div{flex:1;background:#fff;border-radius:.9rem;padding:.55rem .3rem;text-align:center}.sum b{display:block;font-size:1.5rem}.sum span{font-size:.75rem;color:var(--mute)}.sum .r b{color:var(--red)}
@@ -286,6 +288,7 @@ const dated=p=>p.시작&&p.끝&&p.상태!=='제외';
 const activeSites=()=>D.sites.filter(s=>ACTIVE.includes(s.상태));
 const curProc=(id,day)=>liveOf(id).find(p=>dated(p)&&p.시작<=day&&day<=p.끝)||liveOf(id).find(p=>p.상태==='진행')||liveOf(id).find(p=>p.상태!=='완료');
 const late=p=>dated(p)&&p.끝<D.today&&p.상태!=='완료';
+const mparse=x=>{const [raw,tag]=String(x).split('~'),v=raw.startsWith('v:');return {raw:x,id:v?raw.slice(2):raw,video:v,tag:tag||''};};
 const thumb=id=>id.startsWith('data:')?id:`https://drive.google.com/thumbnail?id=${id}&sz=w600`;
 
 // ============ 화면 상태 적용 (서버 Code.gs 와 같은 규칙) ============
@@ -312,7 +315,9 @@ const LOCAL={
   updateRecord(id,p){Object.assign(D.records.find(r=>r.ID===id)||{},p);},
   deleteRecord(id){D.records=D.records.filter(r=>r.ID!==id);},
   addTeam(t){if(teamById(t.팀ID))return t.팀ID;D.teams.push(t);return t.팀ID;},
-  videoDone(rid,fid){const r=D.records.find(x=>x.ID===rid);if(!r)return;const a=r.사진?String(r.사진).split('|').filter(Boolean):[];if(!a.includes('v:'+fid))a.push('v:'+fid);r.사진=a.join('|');},
+  videoDone(rid,fid){const r=D.records.find(x=>x.ID===rid);if(!r)return;const a=r.사진?String(r.사진).split('|').filter(Boolean):[];if(!a.some(x=>mparse(x).id===fid))a.push('v:'+fid);r.사진=a.join('|');},
+  deleteMedia(rid,id){const r=D.records.find(x=>x.ID===rid);if(r)r.사진=String(r.사진||'').split('|').filter(x=>x&&mparse(x).id!==id).join('|');},
+  tagMedia(rid,id,tag){const r=D.records.find(x=>x.ID===rid);if(r)r.사진=String(r.사진||'').split('|').filter(Boolean).map(x=>mparse(x).id===id?String(x).split('~')[0]+(tag?'~'+tag:''):x).join('|');},
   addBiz(b){D.biz=D.biz||[];if(!D.biz.some(x=>x.ID===b.ID))D.biz.push(b);return b.ID;},
   updateBiz(id,p){Object.assign((D.biz||[]).find(x=>x.ID===id)||{},p);},
   deleteBiz(id){D.biz=(D.biz||[]).filter(x=>x.ID!==id);},
@@ -359,7 +364,7 @@ function siteCard(s,b,withStatus){
 function render(){
   const v=S.view,nav=$('#nav');
   nav.style.display=v==='site'?'':'none';$('#bbar').style.display='none';
-  if(v==='site')nav.innerHTML=[['기록','📝','기록'],['공정','📋','공정표·정보']].map(([k,i,n])=>`<div class="${S.tab===k?'on':''}" onclick="S.tab='${k}';render();$('#main').scrollTop=0"><b>${i}</b>${n}</div>`).join('');
+  if(v==='site')nav.innerHTML=[['기록','📝','기록'],['사진','🖼','사진·영상'],['공정','📋','공정표·정보']].map(([k,i,n])=>`<div class="${S.tab===k?'on':''}" onclick="S.tab='${k}';render();$('#main').scrollTop=0"><b>${i}</b>${n}</div>`).join('');
   ({today:renderHome,sites:renderHome,cal:renderCal,site:renderSite,teams:renderTeams,biz:renderBiz})[v]();
   fitAll();
   if(v==='cal')$('#hd').insertAdjacentHTML('afterbegin','<button class="bk" onclick="back()">‹ 뒤로</button>');
@@ -577,6 +582,7 @@ function renderSite(){
   const conf=[];ps.filter(p=>dated(p)&&p.담당팀&&p.끝>=D.today&&p.상태!=='완료').forEach(p=>D.procs.filter(q=>q.현장ID!==s.현장ID&&q.담당팀===p.담당팀&&dated(q)&&q.상태!=='완료'&&q.시작<=p.끝&&p.시작<=q.끝).forEach(q=>conf.push(`${esc(teamName(p.담당팀))} ${md(p.시작>q.시작?p.시작:q.시작)} ${esc(siteById(q.현장ID)?.고객명||'')}과 겹침`)));
   const notes=[...b.warn.map(w=>w.replace('⚠ ','')),...new Set(conf)];
   $('#hd').innerHTML=`<button class="bk" onclick="back()">‹ 뒤로</button><div class="row"><div><div class="d">${esc(s.고객명)} ${esc(s.평형||'')}</div><div class="sub">${esc(s.주소||'')}${s.연락처?` · <a href="tel:${esc(s.연락처)}">📞 ${esc(s.연락처)}</a>`:''}</div></div><button onclick="openSiteForm('${s.현장ID}')">정보</button></div>`;
+  if(S.tab==='사진'){$('#main').innerHTML=gallery(s);return;}
   let h=(S.tab==='기록'?`<h2>무엇을 기록할까요?</h2><div class="qk"><div class="add" onclick="openAddProc('${s.현장ID}')"><em>＋</em>공정 추가</div>${TYPES.map(([t,i])=>`<div onclick="startRecord('${t}','${s.현장ID}')"><em>${i}</em>${t}</div>`).join('')}</div>`+siteTodoHtml(s):'')+`<div class="scard" style="border-left-color:${s.색}"><div class="n">${b.done} / ${b.total} 공정 끝 <span class="tag ${s.상태==='시공중'?'':'gray'}">${s.상태}</span></div><div class="bar"><i style="width:${b.pct}%"></i></div>
     <div class="kv"><div><small>계약금액</small><b>${s.계약금액?man(+s.계약금액):'—'}</b></div><div><small>👷 시공팀</small><b class="fit" style="font-size:.95rem">${tms.length?esc(tms.join(' · ')):'—'}</b></div><div><small>준공예정</small><b>${s.준공예정?md(s.준공예정)+' ('+dow(s.준공예정)+')':'미정'}</b></div><div><small>📷 촬영</small><b style="font-size:.95rem">비포 ${s.착공일?md(s.착공일):'—'}<br>애프터 ${s.준공예정?md(s.준공예정):'—'}</b></div></div></div>
     <div class="card lines"><div class="ln"><span class="k">오늘</span><span class="v">${b.main.replace(/^오늘 /,'')}</span></div>${b.next?`<div class="ln"><span class="k">다음</span><span class="v">${b.next}</span></div>`:''}${notes.map(n=>`<div class="ln r"><span class="k">주의</span><span class="v">${n}</span></div>`).join('')}</div>`;
@@ -595,7 +601,7 @@ function timeline(s){
 }
 function recHtml(r,withSite){
   const ico=ICON[r.유형]||'•';
-  const pics=r.사진||Object.values(VJ).some(j=>j.rid===r.ID)?`<div class="pics">${String(r.사진||'').split('|').filter(id=>id&&!id.startsWith('v:')).map(id=>`<img src="${thumb(id)}" onclick="event.stopPropagation();openPhoto('${id}')">`).join('')}${vidChips(r)}</div>`:'';
+  const pics=mediaRow(r);
   const sub=r.유형==='투입'?` · ${esc(teamName(r.팀ID))} ${r.단가?won(r.단가)+'×':''}${r.공수} · ${won(r.금액)}원${r.지급?' ✓지급':''}`:'';
   const when=(r.일시.slice(0,10)===D.today?'오늘 ':md(r.일시)+' ')+r.일시.slice(11);
   return `<div class="rec" onclick="openRecordEdit('${r.ID}')"><div class="h">${when} · ${ico} ${esc(r.유형)}${withSite?' · '+esc(siteById(r.현장ID)?.고객명||''):''}${esc(sub)}</div><div class="b">${esc(r.내용)}</div>${r.상세?`<div class="dt ${r.유형==='고객 대화'?'kakao':''}">${esc(r.상세)}</div>`:''}${pics}</div>`;
@@ -707,7 +713,9 @@ const readB64=f=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=
 function resize(file,M){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>{const r=Math.min(1,M/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(img.src);res(c.toDataURL('image/jpeg',.7));};img.onerror=()=>{URL.revokeObjectURL(img.src);rej(new Error('decode'));};img.src=URL.createObjectURL(file);});}
 // ---- 영상: 기록은 먼저, 영상은 뒤에서 3MB씩 이어올림 (앱을 닫아도 기기에 보관, 다시 열면 이어서) ----
 const VID=[],VMEM={},VJ={},MAXVID=2048,VCH=3*1048576; // MAXVID: MB
-const vidChips=r=>String(r.사진||'').split('|').filter(i=>i.startsWith('v:')).map(i=>`<a class="vch" href="https://drive.google.com/file/d/${i.slice(2)}/view" target="_blank" onclick="event.stopPropagation()">🎬 영상 보기</a>`).join('')+Object.keys(VJ).filter(k=>VJ[k].rid===r.ID).map(k=>`<span class="vch w" data-k="${k}">🎬 올리는 중 ${VJ[k].pct||0}%</span>`).join('');
+const mThumb=(rid,m)=>`<span class="mt${m.video?' v':''}" onclick="event.stopPropagation();openMedia('${rid}',${m.i})"><img src="${thumb(m.id)}" loading="lazy" alt="" onerror="this.style.visibility='hidden'">${m.video?'<i>▶</i>':''}${m.tag?`<em>${m.tag}</em>`:''}</span>`;
+function mediaRow(r){const its=String(r.사진||'').split('|').filter(Boolean).map((x,i)=>({...mparse(x),i})),pend=Object.keys(VJ).filter(k=>VJ[k].rid===r.ID);
+  return its.length||pend.length?`<div class="pics">${its.map(m=>mThumb(r.ID,m)).join('')}${pend.map(k=>`<span class="vch w" data-k="${k}">🎬 올리는 중 ${VJ[k].pct||0}%</span>`).join('')}</div>`:'';}
 const vidsHtml=()=>VID.map(f=>`<div class="ph">🎬<small>${Math.round(f.size/1048576)}MB</small></div>`).join('');
 function addVideos(files){
   for(const f of files){if(f.size>MAXVID*1048576){toast(`${f.name}: ${MAXVID/1024}GB가 넘어 뺐습니다`);continue;}VID.push(f);}
@@ -759,6 +767,38 @@ async function vidRun(j){
   vidBar();if(!$('#sheet').classList.contains('on')&&!$('#rec').classList.contains('on'))render();
 }
 window.addEventListener('online',vidSync);document.addEventListener('visibilitychange',()=>{if(!document.hidden)vidSync();});setInterval(vidSync,30000);
+
+// ---- 사진·영상 모아보기 (현장별). 지우면 드라이브 휴지통(30일 안 복원 가능) ----
+function gallery(s){
+  const all=[];D.records.filter(r=>r.현장ID===s.현장ID).forEach(r=>String(r.사진||'').split('|').filter(Boolean).forEach((x,i)=>all.push({r,...mparse(x),i})));
+  const pend=Object.keys(VJ).filter(k=>D.records.some(r=>r.ID===VJ[k].rid&&r.현장ID===s.현장ID));
+  const f=S.mf||'전체',list=all.filter(m=>f==='전체'||(f==='영상')===m.video),nV=all.filter(m=>m.video).length;
+  let h=`<div class="seg" style="margin:0 .75rem .6rem">${[['전체',all.length],['사진',all.length-nV],['영상',nV]].map(([k,n])=>`<span class="${f===k?'on':''}" onclick="S.mf='${k}';render()">${k} ${n}</span>`).join('')}</div>
+    <div class="top2" style="grid-template-columns:1fr"><div onclick="openFolder('${s.현장ID}')">📁 드라이브 폴더 열기 (편집용 원본)</div></div>`;
+  if(pend.length)h+=`<div class="note" style="margin:0 1rem .5rem">${pend.map(k=>`<span data-k="${k}">🎬 올리는 중 ${VJ[k].pct||0}%</span>`).join(' · ')}</div>`;
+  if(!list.length)return h+`<div class="empty">${chImg()}${f==='전체'?'사진·영상':f}이 없습니다.<br>현장 점검·제품 선택 기록에서 찍어 올리세요</div>`;
+  const g={};list.forEach(m=>{const d=m.r.일시.slice(0,10);(g[d]=g[d]||[]).push(m);});
+  return h+Object.keys(g).sort().reverse().map(d=>`<h2>${d===D.today?'오늘 · ':''}${md(d)} ${dow(d)}요일 · ${g[d].length}개</h2><div class="gal">${g[d].map(m=>mThumb(m.r.ID,m)).join('')}</div>`).join('');
+}
+function mAt(rid,i){const r=D.records.find(x=>x.ID===rid);if(!r)return {};const list=String(r.사진||'').split('|').filter(Boolean);return {r,list,m:list[i]?{...mparse(list[i]),i}:null};}
+function openMedia(rid,i){const {r,m}=mAt(rid,i);if(!m)return;const pend=m.id.startsWith('data:');
+  openSheet(`<div class="t">${m.video?'🎬 영상':'📷 사진'}${m.tag?' · '+m.tag:''}</div><div class="s">${md(r.일시)} ${r.일시.slice(11)} · ${ICON[r.유형]||''} ${esc(r.유형)}${r.공정?' · '+esc(short(r.공정)):''}</div>
+    <img class="mview" src="${pend?m.id:`https://drive.google.com/thumbnail?id=${m.id}&sz=w1200`}" alt="" onerror="this.style.display='none'">
+    ${r.내용?`<div class="note">${esc(r.내용)}</div>`:''}
+    ${pend?'<div class="note warn">아직 드라이브로 올라가는 중입니다</div>':`<button class="save" onclick="openPhoto('${m.id}')">${m.video?'▶ 영상 재생 (드라이브)':'원본 보기 (드라이브)'}</button>
+      <label class="l">표시 (공사 리포트·편집용)</label><div class="seg">${['','비포','애프터'].map(t=>`<span class="${m.tag===t?'on':''}" onclick="tagMedia('${rid}',${i},'${t}')">${t||'없음'}</span>`).join('')}</div>`}
+    <button class="ghost danger" onclick="delMedia('${rid}',${i})">🗑 지우기 (드라이브 휴지통으로)</button>`);}
+async function tagMedia(rid,i,tag){const {m}=mAt(rid,i);if(!m)return;await api('tagMedia',rid,m.id,tag);render();openMedia(rid,i);}
+async function delMedia(rid,i){const {r,list,m}=mAt(rid,i);if(!m)return;
+  if(!confirm(`이 ${m.video?'영상':'사진'}을 지울까요?\n드라이브 휴지통으로 옮겨지고, 30일 안에는 드라이브에서 되살릴 수 있어요.`))return;
+  if(m.id.startsWith('data:')){ // 아직 안 올라간 사진: 보낼 대기열에서 빼고 기기에서만 지움
+    const after=list.slice(i+1).filter(x=>x.startsWith('data:')).length,ops=(await Q.all()).filter(o=>o.fn==='addPhoto'&&o.args[0]===rid),op=ops[ops.length-1-after];
+    if(!op){toast('지금 올라가는 중이에요. 다 올라간 뒤에 지워주세요');return;}
+    await Q.del(op.id);pending=(await Q.all()).length;badge();list.splice(i,1);r.사진=list.join('|');saveCache();
+  }else await api('deleteMedia',rid,m.id);
+  closeSheet();toast('지웠습니다');render();}
+async function openFolder(id){if(!GAS)return toast('미리보기에서는 열 수 없어요');const w=window.open('','_blank');
+  try{const url=await gas('siteFolder',id);if(w)w.location=url;else location.href=url;}catch(e){if(w)w.close();toast(friendly(e.message));}}
 
 function openPhoto(id){window.open(id.startsWith('data:')?id:`https://drive.google.com/file/d/${id}/view`,'_blank');}
 
@@ -837,7 +877,7 @@ function openRecordEdit(id){
   const r=D.records.find(x=>x.ID===id);if(!r)return;PH.length=VID.length=0;
   openSheet(`<div class="t">${esc(r.유형)} · ${r.일시}</div><label class="l">내용</label><input class="in" id="e_text" value="${esc(r.내용)}"><label class="l">상세</label><textarea class="in" id="e_detail">${esc(r.상세)}</textarea>
     ${r.유형==='투입'?`<label class="l">금액</label><input class="in" id="e_amt" inputmode="numeric" value="${r.금액}"><div class="tog ${r.지급?'on':''}" id="e_paid" onclick="this.classList.toggle('on')"><span>지급 완료</span><i></i></div>`:''}
-    ${r.사진||Object.values(VJ).some(j=>j.rid===r.ID)?`<div class="pics">${String(r.사진||'').split('|').filter(i=>i&&!i.startsWith('v:')).map(i=>`<img src="${thumb(i)}" onclick="openPhoto('${i}')">`).join('')}${vidChips(r)}</div>`:''}
+    ${mediaRow(r)}
     <label class="l">사진·영상 추가</label>${photoBtns()}
     <button class="save" onclick="saveRecordEdit('${id}')">저장</button><button class="ghost danger" onclick="delRecord('${id}')">이 기록 삭제</button>`);
 }
