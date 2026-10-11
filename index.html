@@ -108,11 +108,11 @@ textarea.in{min-height:5rem;resize:vertical;line-height:1.5}
 .back{font-size:1rem;color:var(--mute);text-align:center;padding:.6rem;font-weight:700}
 .done{position:fixed;left:.75rem;right:.75rem;bottom:calc(env(safe-area-inset-bottom) + 5.6rem);background:var(--green);color:#fff;border-radius:1rem;padding:.9rem 1rem;font-size:1.1rem;font-weight:800;display:none;justify-content:space-between;align-items:center;gap:.5rem;box-shadow:0 .6rem 1.4rem rgba(0,0,0,.25);z-index:9}.done.on{display:flex}.done small{font-weight:400;font-size:.8rem;opacity:.9;display:block}.done span{background:rgba(255,255,255,.25);padding:.45rem .8rem;border-radius:.6rem;font-size:.9rem;flex:none}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 12.5rem);transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:999px;font-size:.9rem;z-index:40;opacity:0;transition:.2s;pointer-events:none;max-width:90%;text-align:center}.toast.on{opacity:1}
-.sync{position:fixed;top:calc(env(safe-area-inset-top) + .4rem);right:.7rem;font-size:.7rem;padding:.25rem .6rem;border-radius:999px;z-index:6;color:#fff;font-weight:700}.sync.wait{background:#F2994A}.sync.ok{background:#2FA86A}.sync.err{background:#E04848}
+.sync{flex:none;font-size:.9rem;padding:.4rem 1rem;color:#fff;font-weight:800}.sync.wait{background:#F2994A}.sync.ok{background:#2FA86A}.sync.err{background:#E04848}
 .loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:30;color:var(--mute);font-size:1rem}
 </style></head>
 <body>
-<header id="hd"></header><div class="vidbar" id="vidbar"></div>
+<header id="hd"></header><div class="sync" id="sync" style="display:none"></div><div class="vidbar" id="vidbar"></div>
 <main id="main"></main>
 <div class="bbar" id="bbar"></div>
 <nav id="nav"></nav>
@@ -121,7 +121,7 @@ textarea.in{min-height:5rem;resize:vertical;line-height:1.5}
 <div class="rec-ov" id="rec"></div>
 <div class="done" id="done"></div>
 <div class="toast" id="toast"></div>
-<div class="sync" id="sync" style="display:none"></div>
+
 <div class="loading" id="loading">불러오는 중…</div>
 
 <script>
@@ -227,9 +227,15 @@ async function refresh(){ // 대기열이 비었을 때만 서버 데이터로 �
   if(!GAS||syncing)return;const ops=await IDB.all();if(ops.length)return;
   const r=await gas('getData');D=JSON.parse(r);D.records.sort((x,y)=>x.일시<y.일시?1:-1);saveCache();render();
 }
+// 서버가 돌려준 오류를 대표님이 이해할 말로
+function friendly(m){m=String(m||'');
+  if(/no such function/.test(m))return '서버(Code.gs)가 옛 버전입니다. 새 버전으로 배포해주세요';
+  if(/external_request|permission|권한/i.test(m))return '구글 권한 허용이 필요합니다 (Apps Script에서 setupKey 실행 후 허용)';
+  if(/Failed to fetch|NetworkError|Load failed|abort/i.test(m))return '인터넷 연결을 확인하는 중';
+  return m.slice(0,80)+' · 자동 재시도';}
 function badge(){const el=$('#sync');if(!el)return;if(!GAS){el.style.display='none';return;}
   el.style.display='';clearTimeout(badge.t);
-  if(syncErr){el.className='sync err';el.textContent=syncErr.indexOf('접속 키')>=0?syncErr:'저장 대기 '+pending+' · 연결되면 자동 저장';}
+  if(syncErr){el.className='sync err';el.textContent=syncErr.indexOf('접속 키')>=0?syncErr:'저장 대기 '+pending+'건 · '+friendly(syncErr);}
   else if(pending>0){el.className='sync wait';el.textContent='저장 중 '+pending;}
   else{el.className='sync ok';el.textContent='모두 저장됨';badge.t=setTimeout(()=>{if(!pending&&!syncErr)el.style.display='none';},2000);}
 }
@@ -458,10 +464,10 @@ function renderSite(){
 function timeline(s){
   const all=D.records.filter(r=>r.현장ID===s.현장ID);
   const f=S.filter, list=f==='전체'?all:all.filter(r=>r.유형===f);
-  const chips=['전체',...TYPES.map(t=>t[0]),'할 일'].map(t=>`<span class="${f===t?'on':''}" onclick="S.filter='${t}';render()">${t}</span>`).join('');
-  if(!list.length)return `<div class="chips">${chips}</div><div class="empty">${chImg()}기록이 없습니다.<br>아래 "＋ 이 현장에 기록"을 누르세요</div>`;
+  const chips='';
+  if(!list.length)return `<div class="empty">${chImg()}기록이 없습니다.<br>아래 "＋ 이 현장에 기록"을 누르세요</div>`;
   const groups={};list.forEach(r=>{(groups[r.일시.slice(0,10)]=groups[r.일시.slice(0,10)]||[]).push(r)});
-  return `<div class="chips">${chips}</div>`+Object.keys(groups).sort().reverse().map(d=>{
+  return ``+Object.keys(groups).sort().reverse().map(d=>{
     const p=liveOf(s.현장ID).find(p=>dated(p)&&p.시작<=d&&d<=p.끝);
     return `<h2>${d===D.today?'오늘 · ':''}${md(d)} ${dow(d)}요일${p?' · '+esc(short(p.공정)):''}</h2><div class="card">${groups[d].map(r=>recHtml(r)).join('')}</div>`;}).join('');
 }
@@ -595,7 +601,7 @@ async function vidCancel(rid){
 }
 function vidBar(){
   const ks=Object.keys(VJ),el=$('#vidbar');if(!el)return;
-  if(!ks.length){el.style.display='none';}else{const j=VJ[ks[0]];el.style.display='block';el.textContent=`🎬 영상 ${ks.length}개 올리는 중 ${j.pct||0}%${j.err?' · 다시 시도 중':''} · 앱을 열어 두세요`;}
+  if(!ks.length){el.style.display='none';}else{const j=VJ[ks[0]];el.style.display='block';el.textContent=`🎬 영상 ${ks.length}개 올리는 중 ${j.pct||0}%${j.err?' · 다시 시도 중: '+j.err:' · 앱을 열어 두세요'}`;}
   document.querySelectorAll('[data-k]').forEach(e=>{const j=VJ[e.dataset.k];if(j)e.textContent=`🎬 올리는 중 ${j.pct||0}%`;});
 }
 let vbusy=false,wake=null;
@@ -609,7 +615,7 @@ async function vidSync(){
       if(!jobs.length)break;
       const ops=await IDB.all().catch(()=>[]),j=jobs.find(x=>!ops.some(o=>o.fn==='addRecord'&&o.args[0].ID===x.recordId)); // 기록이 서버에 올라간 뒤에만
       if(!j){await new Promise(r=>setTimeout(r,5000));continue;}
-      try{await vidRun(j);}catch(e){if(e.auth)break;VJ[j.key]={...VJ[j.key],err:1};vidBar();await new Promise(r=>setTimeout(r,15000));}
+      try{await vidRun(j);}catch(e){if(e.auth)break;VJ[j.key]={...VJ[j.key],err:friendly(e.message)};vidBar();await new Promise(r=>setTimeout(r,15000));}
     }
   }finally{vbusy=false;try{wake&&wake.release();}catch(e){}wake=null;}
 }
