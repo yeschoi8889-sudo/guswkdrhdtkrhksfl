@@ -25,6 +25,15 @@ h2{font-size:14px;color:var(--mute);font-weight:800;margin:22px 18px 8px}
 .st i{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid #d8d2d7;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-style:normal;color:#fff}
 .st.done i{background:var(--green);border-color:var(--green)}.st.now i{background:var(--rose);border-color:var(--rose)}.st.now{font-weight:800}
 .st span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.st small{flex:none;color:var(--mute);font-size:13px}.st.done span,.st.done small{color:#8a838e}
+:root{--pink:#FBDDE7;--pink2:#F2A9C0;--gray:#F1EFF2;--gt:#9A94A0}
+.tl{position:relative;margin:6px 14px 0 14px;padding-left:34px}.it{position:relative;margin-bottom:9px}.it::before{content:"";position:absolute;left:-23px;top:0;bottom:-9px;width:2px;background:#E6E1E9}.it.d::before{background:#CFC9D3}.it:last-child::before{display:none}
+.dot{position:absolute;left:-30px;top:14px;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #D8D2DC;z-index:1;color:#fff;font-size:10px;text-align:center;line-height:12px;font-style:normal}
+.d .dot{background:#C6C0CB;border-color:#C6C0CB}.n .dot{width:22px;height:22px;left:-33px;border:3px solid var(--rose);background:#fff;box-shadow:0 0 0 4px var(--pink)}.n .dot::after{content:"";position:absolute;inset:3px;background:var(--rose);border-radius:50%}
+.it>.c{border-radius:16px;padding:11px 14px;background:#fff;border:1px solid #ECE8EE;font-size:14px}.c .h{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.c .h b{font-size:15px}.c .t{font-size:12px;color:#8d8792;text-align:right}.c .t em{font-style:normal;font-weight:800}.c .s{font-size:12.5px;color:#8d8792;margin-top:2px}
+.d>.c{background:var(--gray);border-color:var(--gray);color:var(--gt);padding:10px 14px}.d>.c .h b{color:#8d8792}.d>.c.x{cursor:pointer}.d>.c.open .t em{display:inline-block;transform:rotate(90deg)}
+.n>.c{background:var(--rose);border:0;color:#fff;padding:13px 14px;box-shadow:0 6px 16px rgba(217,72,122,.3)}.n>.c .h b{font-size:18px}.n>.c .t{color:#fff;font-weight:800;font-size:13px}.n>.c .s{color:rgba(255,255,255,.9);font-size:13px}
+.n>.c .bar{background:rgba(255,255,255,.35);margin-top:10px}.n>.c .bar i{background:#fff}.n .pd .memo,.n .prodl,.n .prodl b{color:#fff}.n .pdh{color:rgba(255,255,255,.85)}.ex{display:none}.c.open .ex,.n .ex{display:block}
+.pd{margin-top:12px}.pdh{font-size:12px;font-weight:800;color:var(--mute);margin-bottom:5px}.pd .memo{font-size:15px;font-weight:700;line-height:1.5;margin:4px 0 8px;color:var(--ink)}.prodl{font-size:14px;margin:4px 0 8px;color:var(--ink)}.prodl b{color:var(--plum)}
 .day{margin:0 14px 14px}.day .dh{font-size:15px;font-weight:800;margin:0 4px 6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .tag{font-size:12px;background:var(--blush);color:var(--rose);border-radius:999px;padding:2px 9px;font-weight:700;white-space:nowrap}
 .ms{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:6px;font-size:15px}.ms.prod{border-left:4px solid var(--lav)}.ms .k{color:var(--mute);font-size:13px;display:block}
@@ -57,16 +66,17 @@ const kd=s=>s?`${+s.slice(5,7)}월 ${+s.slice(8,10)}일 (${DOW[pd(s).getDay()]})
 const short=n=>String(n||'').split('(')[0];
 const isWork=d=>d.getDay()%6!==0,workdays=(a,b)=>{let n=0;for(let d=new Date(a);d<=b;d.setDate(d.getDate()+1))if(isWork(d))n++;return Math.max(n,1)};
 const days=(a,b)=>Math.round((pd(b)-pd(a))/864e5);
-let R=null,WM='최고집 - LX하우시스 (예스초이)',WM2='';
+let R=null,WM='예스초이 - LX하우시스 (최고집)',WM2='';
 async function load(){
   const el=document.getElementById('app');
   const url=API?API+'?s='+encodeURIComponent(tok):LOCAL?'sample_report.json':'';
   if(!url||(API&&!tok)){el.innerHTML='<div class="err">링크가 올바르지 않습니다.<br>최고집에서 받은 링크로 다시 열어주세요.</div>';return;}
   try{const r=await fetch(url,{redirect:'follow'});R=await r.json();}catch(e){el.innerHTML='<div class="err">불러오지 못했어요.<br>인터넷 연결을 확인하고 다시 열어주세요.</div>';return;}
   if(!R.ok){el.innerHTML=`<div class="err">${esc(R.error||'링크가 꺼져 있거나 잘못된 링크입니다')}<br>${esc((R.brand||{}).회사||'최고집')}에 문의해 주세요.</div>`;return;}
-  R.brand=R.brand||{};WM=R.brand.워터마크||'최고집 - LX하우시스 (예스초이)';WM2=(R.brand.유튜브||'').replace(/\/$/,'').split('/').pop();if(WM2[0]!=='@')WM2='';
+  R.brand=R.brand||{};WM=R.brand.워터마크||'예스초이 - LX하우시스 (최고집)';WM2=(R.brand.유튜브||'').replace(/\/$/,'').split('/').pop();if(WM2[0]!=='@')WM2='';
   document.title=`${R.site.고객명} 고객님 공사 진행 리포트 · ${R.brand.회사||'최고집'}`;
-  el.innerHTML=page();lazy();
+  el.innerHTML=page();if(q.get('open')==='all')document.querySelectorAll('.it.d .c.x').forEach(e=>e.classList.add('open')); // 미리보기용: 끝난 공정 모두 펼침
+  lazy();
 }
 function page(){
   const s=R.site,t=R.today,ps=R.procs,total=ps.length,done=ps.filter(p=>p.상태==='완료').length;
@@ -78,25 +88,45 @@ function page(){
   else if(nx){now=`다음 공정 <b>${esc(short(nx.공정))}</b>`;till=`${kd(nx.시작)} 시작 예정`;}
   else now='공사 일정을 준비하고 있어요';
   const dd=s.준공예정?days(t,s.준공예정):null,fin=s.준공예정?`준공 예정 <b>${kd(s.준공예정)}</b>${dd>0?` · D-${dd}`:dd===0?' · 오늘':''}`:'준공 예정일은 정해지면 표시돼요';
-  const nPic=R.recs.reduce((n,r)=>n+r.media.filter(m=>!m.v).length,0);
+  const T=tlHtml(),nPic=R.recs.reduce((n,r)=>n+r.media.filter(m=>!m.v).length,0);
   return `<header><div class="brand">${esc(R.brand.회사||'최고집')} 공사 진행 리포트</div><h1>${esc(s.고객명)} 고객님 댁</h1><div class="sub">${esc(s.평형||'')}${s.착공일?` · 착공 ${md(s.착공일)}`:''}</div>${CH?`<img class="cz" alt="" src="${CH}">`:''}</header>
   <div class="hero"><div class="now">${now}</div>${till?`<div class="till">${till}</div>`:''}<div class="bar"><i style="width:${total?Math.round(done/total*100):0}%"></i></div><div class="pct"><span><b>${done}</b> / ${total} 공정 완료</span><span>${fin}</span></div></div>
   ${beforeAfter()}
-  <h2>공정 진행표</h2><div class="card steps">${ps.map(p=>{const cur=curs.includes(p)||p.상태==='진행',cls=p.상태==='완료'?'done':cur?'now':'';return `<div class="st ${cls}"><i>${p.상태==='완료'?'✓':cur?'●':''}</i><span>${esc(short(p.공정))}</span><small>${p.시작?md(p.시작)+(p.끝&&p.끝!==p.시작?'~'+md(p.끝):''):'예정'}</small></div>`;}).join('')}</div>
-  <h2>현장 기록${nPic?` <span style="font-weight:400">· 사진 ${nPic}장</span>`:''}</h2>${timeline()}
+  <h2>공사 진행 과정${nPic?` <span style="font-weight:400">· 사진 ${nPic}장</span>`:''}</h2><div class="tl">${T.tl}</div>${T.misc}
   <footer>${CH?`<img src="${CH}" alt="" style="height:88px">`:''}<div style="font-weight:800;color:var(--plum);font-size:15px">${esc(R.brand.회사||'최고집')}</div><div>${esc(R.brand.소개||'')}</div>
   ${R.brand.유튜브?`<a class="yt" href="${esc(R.brand.유튜브)}" target="_blank" rel="noopener">▶ ${esc(R.brand.유튜브문구||'유튜브 채널 보기')}</a>`:''}
   <div>이 페이지는 ${esc(R.brand.회사||'최고집')}이 고객님께만 드리는 링크예요.<br>사진 가운데에 ${esc(WM)} 표시가 들어 있어요.</div></footer>`;
 }
+// ---- 공정별 타임라인: 끝난 공정=회색(눌러서 펼침) · 지금 공정=연한 핑크(펼쳐짐) · 앞으로=흰색 ----
+function assign(){const map=new Map(R.procs.map(p=>[p.순번,[]])),misc=[];
+  R.recs.forEach(r=>{if(r.유형==='공정 시작'||r.유형==='공정 끝')return;const d=r.일시.slice(0,10);
+    let p=R.procs.find(x=>r.공정&&x.공정===r.공정);if(!p&&!r.공정)p=R.procs.find(x=>x.시작&&x.끝&&x.시작<=d&&d<=x.끝);
+    if(p)map.get(p.순번).push(r);else misc.push(r);});return {map,misc};}
+function procBody(rs){const g={};rs.forEach(r=>(g[r.일시.slice(0,10)]=g[r.일시.slice(0,10)]||[]).push(r));
+  return Object.keys(g).sort().reverse().map(d=>{const a=g[d],
+    memos=a.filter(r=>r.유형==='고객 보고'&&r.내용).map(r=>`<div class="memo">💬 ${esc(r.내용)}</div>`).join(''),
+    prod=a.filter(r=>r.유형==='제품 선택').map(r=>`<div class="prodl">선택하신 제품 · <b>${esc(r.내용)}</b></div>`).join(''),
+    pics=a.flatMap(r=>r.media.map(m=>tile(m,d,m.cap||'')));
+    return `<div class="pd"><div class="pdh">${d===R.today?'오늘 · ':''}${kd(d)}</div>${memos}${prod}${pics.length?`<div class="grid">${pics.join('')}</div>`:''}</div>`;}).join('');}
+function tlHtml(){const {map,misc}=assign(),t=R.today;
+  const tl=R.procs.map(p=>{const rs=map.get(p.순번),nm=rs.reduce((n,r)=>n+r.media.length,0),body=rs.length?procBody(rs):'',
+    cur=(p.시작&&p.끝&&p.시작<=t&&t<=p.끝&&p.상태!=='완료')||p.상태==='진행',done=p.상태==='완료',
+    rng=p.시작?md(p.시작)+(p.끝&&p.끝!==p.시작?'~'+md(p.끝):''):'일정 미정';
+    if(done)return `<div class="it d"><i class="dot">✓</i><div class="c ${body?'x':''}" ${body?'onclick="tg(this)"':''}><div class="h"><b>${esc(short(p.공정))}</b><span class="t">${rng}${nm?` · 사진 ${nm}장`:''}${body?' <em>›</em>':''}</span></div><div class="ex">${body}</div></div></div>`;
+    if(cur){const n=p.시작&&p.끝?workdays(pd(p.시작),pd(p.끝)):0,i=n?Math.min(workdays(pd(p.시작),pd(t)),n):0;
+      return `<div class="it n"><i class="dot"></i><div class="c"><div class="h"><b>${esc(short(p.공정))}</b><span class="t">${n>1?(i>=n?'마지막 날':`오늘 ${i}일째 / ${n}일`):'오늘'}</span></div><div class="s">${rng}</div>${n>1?`<div class="bar"><i style="width:${Math.round(i/n*100)}%"></i></div>`:''}<div class="ex">${body||'<div class="s" style="margin-top:8px">곧 사진이 올라와요</div>'}</div></div></div>`;}
+    return `<div class="it"><i class="dot"></i><div class="c"><div class="h"><b>${esc(short(p.공정))}</b><span class="t">${p.시작?rng+' 예정':'일정 미정'}</span></div></div></div>`;}).join('');
+  return {tl,misc:misc.length?`<h2>그 밖의 기록</h2>${timeline(misc)}`:''};}
+function tg(el){el.classList.toggle('open');lazy();}
 function beforeAfter(){
   const all=[];R.recs.slice().reverse().forEach(r=>r.media.forEach(m=>{if(!m.v)all.push({m,d:r.일시.slice(0,10),p:r.공정})}));
   const bf=all.find(x=>x.m.tag==='비포'),af=all.filter(x=>x.m.tag==='애프터').pop();
   if(!bf||!af)return '';
   return `<h2>비포 → 애프터</h2><div class="card"><div class="ba"><div>${tile(bf.m,bf.d,bf.p,1)}<div class="lb">비포 · ${md(bf.d)}</div></div><div class="ar">→</div><div>${tile(af.m,af.d,af.p,1)}<div class="lb">애프터 · ${md(af.d)}</div></div></div></div>`;
 }
-function timeline(){
-  if(!R.recs.length)return '<div class="card" style="color:var(--mute);text-align:center;padding:24px">아직 기록이 없어요.<br>공사가 시작되면 사진이 올라와요.</div>';
-  const g={};R.recs.forEach(r=>{(g[r.일시.slice(0,10)]=g[r.일시.slice(0,10)]||[]).push(r)});
+function timeline(L){L=L||L;
+  if(!L.length)return '<div class="card" style="color:var(--mute);text-align:center;padding:24px">아직 기록이 없어요.<br>공사가 시작되면 사진이 올라와요.</div>';
+  const g={};L.forEach(r=>{(g[r.일시.slice(0,10)]=g[r.일시.slice(0,10)]||[]).push(r)});
   return Object.keys(g).sort().reverse().map(d=>{
     const pn=[...new Set(R.procs.filter(p=>p.시작&&p.끝&&p.시작<=d&&d<=p.끝).map(p=>short(p.공정)))],rs=g[d];
     const ms=rs.filter(r=>r.유형==='공정 시작'||r.유형==='공정 끝').map(r=>`<div class="ms">${r.유형==='공정 끝'?'✅':'▶️'} ${esc(short(r.공정))} ${r.유형==='공정 끝'?'완료':'시작'}</div>`).join('');
@@ -108,24 +138,25 @@ function timeline(){
 }
 let TID=0;const TILES={};
 function tile(m,d,proc,noTag){const id='t'+(++TID);TILES[id]={m,cap:`${kd(d)}${proc?' · '+short(proc):''}${m.tag?' · '+m.tag:''}`};
-  return `<div class="ph ${m.v?'v':''} ${m.cap?'cpd':''}" id="${id}" data-wm="${esc(WM)}" onclick="open_('${id}')">${m.tag&&!noTag?`<span class="tg">${esc(m.tag)}</span>`:''}${m.cap?`<span class="cp">${esc(m.cap)}</span>`:''}</div>`;}
+  return `<div class="ph ${m.v?'v':''} ${m.cap?'cpd':''}" id="${id}" data-wm="${esc(WM.split(' - ')[0])}" onclick="open_('${id}')">${m.tag&&!noTag?`<span class="tg">${esc(m.tag)}</span>`:''}${m.cap?`<span class="cp">${esc(m.cap)}</span>`:''}</div>`;}
 // 보이는 사진부터 4장씩 불러와 워터마크를 찍음
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);enqueue(()=>fill(e.target));}}),{rootMargin:'300px'});
 function lazy(){document.querySelectorAll('.ph').forEach(el=>io.observe(el));}
 const QQ=[];let act=0;function enqueue(f){QQ.push(f);pump();}function pump(){while(act<4&&QQ.length){act++;QQ.shift()().catch(()=>{}).finally(()=>{act--;pump();});}}
-async function fill(el){const t=TILES[el.id];if(!t)return;const im=document.createElement('img');im.alt='';
+async function fill(el){const t=TILES[el.id];if(!t||el.dataset.f)return;el.dataset.f=1;const im=document.createElement('img');im.alt='';
   if(t.m.v){im.src=t.m.src;im.onerror=()=>{im.remove();el.style.background='#3A1C33';};el.appendChild(im);return;}
   const r=await mark(t.m.src);if(!r.src){el.innerHTML='<div class="wait">사진 준비 중</div>';return;}
   t.url=r.src;if(!r.wm)el.classList.add('nowm');im.src=r.src;el.appendChild(im);}
 // 캔버스에 그려 사진 정중앙에 '최고집'(+유튜브 핸들) → 길게 눌러 저장해도 표시가 남음. 그림 서버가 교차 출처를 막으면 원본 그대로 두고 CSS 글자만 얹음(nowm)
 function mark(src){return new Promise(res=>{const im=new Image();im.crossOrigin='anonymous';
   im.onload=()=>{try{const W=Math.min(im.naturalWidth,1600),H=Math.round(im.naturalHeight*W/im.naturalWidth),c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');g.drawImage(im,0,0,W,H);
-    let fs=Math.max(30,Math.round(W/9));const F='-apple-system,"Apple SD Gothic Neo",sans-serif';
-    g.font=`800 ${fs}px ${F}`;while(g.measureText(WM).width>W*.86&&fs>16){fs-=2;g.font=`800 ${fs}px ${F}`;} // 긴 문구는 폭에 맞춰 줄임
-    const cx=W/2,cy=H/2-(WM2?fs*.3:0); // 정중앙 반투명 (가장자리를 잘라도 남음)
-    g.textAlign='center';g.textBaseline='middle';g.shadowColor='rgba(0,0,0,.55)';g.shadowBlur=fs/4;g.fillStyle='rgba(255,255,255,.5)';
-    g.font=`800 ${fs}px ${F}`;g.fillText(WM,cx,cy);
-    if(WM2){g.font=`700 ${Math.round(fs*.36)}px ${F}`;g.fillStyle='rgba(255,255,255,.5)';g.fillText('youtube '+WM2,cx,cy+fs*.75);}
+    // 정중앙 반투명 워터마크. 폭 기준은 짧은 변(B): 썸네일이 정사각·세로로 잘려도 문구가 안 잘림. 'A - B' 는 두 줄(A 크게, B 작게)
+    const B=Math.min(W,H),F='-apple-system,"Apple SD Gothic Neo",sans-serif',pt=WM.split(' - '),l1=pt[0],l2=pt.slice(1).join(' - ');
+    let fs=Math.max(26,Math.round(B/7));const wid=()=>{g.font=`800 ${fs}px ${F}`;let w=g.measureText(l1).width;if(l2){g.font=`700 ${fs*.5}px ${F}`;w=Math.max(w,g.measureText(l2).width);}return w;};
+    while(wid()>B*.82&&fs>14)fs-=2;
+    const L=[{t:l1,s:fs,w:800},l2&&{t:l2,s:fs*.5,w:700},WM2&&{t:'youtube '+WM2,s:fs*.36,w:700}].filter(Boolean),tot=L.reduce((n,x)=>n+x.s*1.3,0);let y=H/2-tot/2;
+    g.textAlign='center';g.textBaseline='middle';g.shadowColor='rgba(0,0,0,.55)';g.shadowBlur=fs/4;g.fillStyle='rgba(255,255,255,.55)';
+    L.forEach(x=>{g.font=`${x.w} ${x.s}px ${F}`;g.fillText(x.t,W/2,y+x.s*.65);y+=x.s*1.3;});
     c.toBlob(b=>res({src:b?URL.createObjectURL(b):src,wm:!!b}),'image/jpeg',.86);}catch(e){res({src,wm:false});}};
   im.onerror=()=>{const im2=new Image();im2.onload=()=>res({src,wm:false});im2.onerror=()=>res({src:''});im2.src=src;};im.src=src;});}
 async function open_(id){const t=TILES[id];if(!t)return;if(t.m.v){window.open(t.m.href,'_blank');return;}
